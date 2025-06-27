@@ -1,0 +1,41 @@
+#include "jugador.h"
+
+Jugador::Jugador(QPixmap _hojaSprite)
+    : Personaje(_hojaSprite)
+{
+    x = 187;
+    y = 87;
+    setFlag(QGraphicsItem::ItemIsFocusable);
+}
+
+void Jugador::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_A:
+        movimiento(-5, 0);
+        movimientoSprite(2496);
+        break;
+    case Qt::Key_W:
+        movimiento(0, -5);
+        movimientoSprite(2432);
+        break;
+    case Qt::Key_S:
+        movimiento(0, 5);
+        movimientoSprite(2560);
+        break;
+    case Qt::Key_D:
+        movimiento(5, 0);
+        movimientoSprite(2624);
+        break;
+    default:
+        QGraphicsItem::keyPressEvent(event);
+        break;
+    }
+}
+
+void Jugador::movimiento(int dx, int dy)
+{
+    x += dx;
+    y += dy;
+    setPos(x, y);
+}

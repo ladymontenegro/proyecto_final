@@ -1,7 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QMainWindow>
+#include <QPixmap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,8 +19,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void crearMurosLaberinto();
+
+private slots:
+    void nivel1();
 
 private:
     Ui::MainWindow *ui;
+    QGraphicsView *view;
+    QGraphicsScene *scene;
 };
 #endif // MAINWINDOW_H
