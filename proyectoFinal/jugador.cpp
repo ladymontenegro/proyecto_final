@@ -1,4 +1,5 @@
 #include "jugador.h"
+//#include <QDebug>
 
 Jugador::Jugador(QPixmap _hojaSprite)
     : Personaje(_hojaSprite)
@@ -35,12 +36,26 @@ void Jugador::keyPressEvent(QKeyEvent *event)
 
 void Jugador::movimiento(int dx, int dy)
 {
+    // Posicion actual antes de intentar el movimiento
+    qreal oldX = x;
+    qreal oldY = y;
+
+    // Intenta mover al jugador
     setPos(x + dx, y + dy);
+
+    // Actualiza la nueva posicion
+    x = pos().x();
+    y = pos().y();
+
     QList<QGraphicsItem *> itemsChocados
-        = collidingItems();                     // Obtiene los elementos con los que colisiona
-    for (QGraphicsItem *item : itemsChocados) { // Itera sobre los elementos colisionados
+        = collidingItems(); // Obtiene los elementos con los que colisiona
+
+    for (QGraphicsItem *item : itemsChocados) {        // Itera sobre los elementos colisionados
         if (item->type() == QGraphicsRectItem::Type) { // Si colisiona con un rectangulo
-            setPos(x - dx, y - dy);                    // Deshace el movimiento
+            // Deshace el movimiento y pone la posicion anterior
+            setPos(oldX, oldY);
+            x = oldX; //Actualizar variables miembro
+            y = oldY;
             break;
         }
     }
