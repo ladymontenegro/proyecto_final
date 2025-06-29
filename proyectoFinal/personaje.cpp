@@ -10,7 +10,7 @@ Personaje::Personaje(QPixmap _hojaSprite)
     , conteoSprite(0)
 {
     sprite = hojaSprite.copy(posicionX, posicionY, anchoSprite, altoSprite);
-    QPixmap spriteEscalado = sprite.scaled(25, 25);
+    QPixmap spriteEscalado = sprite.scaled(22, 22);
     setPixmap(spriteEscalado);
 }
 
@@ -19,7 +19,7 @@ void Personaje::movimientoSprite(int direccion)
     posicionY = direccion;
     posicionX = anchoSprite * conteoSprite;
     sprite = hojaSprite.copy(posicionX, posicionY, anchoSprite, altoSprite);
-    QPixmap spriteEscalado = sprite.scaled(25, 25);
+    QPixmap spriteEscalado = sprite.scaled(22, 22);
     setPixmap(spriteEscalado);
     conteoSprite++;
 
