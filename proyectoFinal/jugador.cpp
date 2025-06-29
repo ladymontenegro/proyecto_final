@@ -35,7 +35,13 @@ void Jugador::keyPressEvent(QKeyEvent *event)
 
 void Jugador::movimiento(int dx, int dy)
 {
-    x += dx;
-    y += dy;
-    setPos(x, y);
+    setPos(x + dx, y + dy);
+    QList<QGraphicsItem *> itemsChocados
+        = collidingItems();                     // Obtiene los elementos con los que colisiona
+    for (QGraphicsItem *item : itemsChocados) { // Itera sobre los elementos colisionados
+        if (item->type() == QGraphicsRectItem::Type) { // Si colisiona con un rectangulo
+            setPos(x - dx, y - dy);                    // Deshace el movimiento
+            break;
+        }
+    }
 }
