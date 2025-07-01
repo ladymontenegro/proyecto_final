@@ -18,8 +18,8 @@ protected:
     QPixmap hojaBarraVida;
     QPixmap barraVida;
     QTimer *tempMovimiento;
-    int posicionX;
-    int posicionY;
+    unsigned short posicionX;
+    unsigned short posicionY;
     unsigned int anchoSprite;
     unsigned int altoSprite;
     unsigned int conteoSprite;

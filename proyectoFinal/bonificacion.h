@@ -4,16 +4,17 @@
 
 class Bonificacion
 {
+private:
+    QPixmap sprite;
+    unsigned short valorCarga;
+    unsigned short altoSprite;
+    unsigned short anchoSprite;
+    qreal x;
+    qreal y;
+
 public:
     Bonificacion();
     void posicionPredeterminada();
-private:
-    QPixmap sprite;
-    int valorCarga;
-    int altoSprite;
-    int anchoSprite;
-    qreal x;
-    qreal y;
 };
 
 #endif // BONIFICACION_H
