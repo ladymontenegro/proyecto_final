@@ -77,12 +77,27 @@ void MainWindow::crearMurosLaberinto()
            {845, 441, 27, 27}, {942, 47, 27, 27},  {960, 354, 27, 27},  {960, 870, 27, 27},
            {0, 755, 41, 8}};
 
+    QVector<QRectF> posicionesCuadrado
+        = {{482, 462, 20, 20}, {502, 462, 20, 20},{522, 462, 20, 20}, {542, 462, 20, 20},
+           {482, 482, 20, 20}, {482, 502, 20, 20}, {482, 522, 20, 20}, {542, 482, 20, 20},
+           {542, 502, 20, 20}, {542, 522, 20, 20}, {502, 522, 20, 20}, {522, 522, 20, 20}};
+
     for (const QRectF &datosMuros : posicionesMuros) {
         QGraphicsRectItem *muro = new QGraphicsRectItem(datosMuros);
         muro->setScale(0.683);
         muro->setBrush(Qt::NoBrush); //relleno invisible
         muro->setPen(Qt::NoPen);     //borde invisible
         scene->addItem(muro);
+    }
+
+    for (const QRectF &datosCuadrado : posicionesCuadrado) {
+        QGraphicsRectItem *cuadrado = new QGraphicsRectItem(datosCuadrado);
+        cuadrado->setScale(0.683);
+        cuadrado->setBrush(QColor("#053270"));
+        cuadrado->setPen(QColor("#FFFFFF"));
+        cuadrado->setFlag(QGraphicsItem::ItemIsMovable);
+        cuadrado->setOpacity(0.5);
+        scene->addItem(cuadrado);
     }
 }
 

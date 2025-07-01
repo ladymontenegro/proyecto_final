@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>../multimedia/laberinto.png</file>
         <file>../multimedia/goku.png</file>
+        <file>../multimedia/plato.png</file>
     </qresource>
 </RCC>
