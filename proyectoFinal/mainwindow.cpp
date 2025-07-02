@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include <QVector>
+#include <QGraphicsItem>
 #include "QGraphicsPixmapItem"
 #include "jugador.h"
+#include "bonificacion.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -102,6 +104,21 @@ void MainWindow::crearMurosLaberinto()
     }
 }
 
+void MainWindow::ubicarBonificaciones(){
+    QVector<QPoint> posicionesBonificaciones = {
+        {100, 200}, {300, 400}, {500, 600}, {430, 430},
+        {100, 200}, {300, 400}, {500, 600}, {350, 350}
+};
+    QPixmap plato(":/multimedia/plato.png");
+    plato = plato.scaled(20, 20);
+
+    for(QPoint &punto : posicionesBonificaciones){
+        Bonificacion *bonificacion = new Bonificacion(plato);
+        bonificacion->setPos(punto.x(), punto.y());
+        scene->addItem(bonificacion);
+    }
+}
+
 void MainWindow::nivel1()
 {
     //crear el laberinto
@@ -112,6 +129,7 @@ void MainWindow::nivel1()
     scene->addItem(laberinto);
     scene->setSceneRect(laberinto->boundingRect());
     crearMurosLaberinto();
+    ubicarBonificaciones();
 
     //agregar al jugador
     QPixmap spriteGoku(":/multimedia/goku.png");
@@ -120,3 +138,4 @@ void MainWindow::nivel1()
     goku->setFocus();
     goku->setPos(187, 87);
 }
+

@@ -1,8 +1,10 @@
+
 #ifndef BONIFICACION_H
 #define BONIFICACION_H
+
 #include <QGraphicsPixmapItem>
 
-class Bonificacion
+class Bonificacion : public QGraphicsPixmapItem
 {
 private:
     QPixmap sprite;
@@ -13,8 +15,9 @@ private:
     qreal y;
 
 public:
-    Bonificacion();
-    void posicionPredeterminada();
+    Bonificacion(const QPixmap &_sprite, QGraphicsItem *parent = nullptr);
+    unsigned short getValorCarga() const;
 };
 
 #endif // BONIFICACION_H
+

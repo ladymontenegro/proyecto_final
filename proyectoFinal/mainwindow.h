@@ -20,6 +20,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void crearMurosLaberinto();
+    void ubicarBonificaciones();
 
 private slots:
     void nivel1();
