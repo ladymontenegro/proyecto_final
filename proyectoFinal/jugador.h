@@ -2,6 +2,7 @@
 #define JUGADOR_H
 #include <QTimer>
 #include "personaje.h"
+#include "bonificacion.h"
 
 class Jugador : public Personaje
 {
@@ -31,6 +32,9 @@ protected:
     void movimientoPoderGoku();
     void verificarSuperCargado();
     void lanzarPoderGoku();
+
+signals:
+    void bonificacionRecolectada(Bonificacion* bonificacion);
 };
 
 #endif // JUGADOR_H

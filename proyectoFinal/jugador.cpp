@@ -124,9 +124,7 @@ void Jugador::movimiento(int dx, int dy)
         } else if (item->type() == QGraphicsPixmapItem::Type) {
             Bonificacion *bonificacion = dynamic_cast<Bonificacion *>(item);
             if (bonificacion) {
-                scene()->removeItem(bonificacion);
-                cargaSuper += bonificacion->getValorCarga();
-                delete bonificacion;
+                emit bonificacionRecolectada(bonificacion);
             }
         }
     }
@@ -147,10 +145,7 @@ void Jugador::movimientoPoderGoku()
         posicionXPoderGoku = 0;
         anchoSpriteMovimientoPoderGoku = 66; // Ancho por defecto
         posicionXPoderGoku = contadorspriteMovimientoPoderGoku * anchoSpriteMovimientoPoderGoku;
-        spriteMovimientoPoderGoku = hojaMovimientoPoderGoku.copy(posicionXPoderGoku,
-                                                                 0,
-                                                                 anchoSpriteMovimientoPoderGoku,
-                                                                 128);
+        spriteMovimientoPoderGoku = hojaMovimientoPoderGoku.copy(posicionXPoderGoku, 0, anchoSpriteMovimientoPoderGoku, 128);
         QPixmap spriteEscalado = spriteMovimientoPoderGoku.scaled(22, 32);
 
         //espejar el sprite
