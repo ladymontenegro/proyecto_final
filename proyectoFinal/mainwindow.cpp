@@ -144,6 +144,7 @@ void MainWindow::nivel1()
     timerReaparicion->setInterval(5000);
     connect(timerReaparicion, &QTimer::timeout, this, &MainWindow::reaparecerBonificaciones);
     connect(goku, &Jugador::bonificacionRecolectada, this, &MainWindow::manejarBonificacionRecolectada);
+    connect(goku, &Jugador::poderLanzado, this, &MainWindow::resetCargaSuperYActualizarBarra);
     ubicarBonificaciones();
 
 }
@@ -219,7 +220,7 @@ void MainWindow::crearMurosLaberinto()
 
     for (const QRectF &datosCuadrado : posicionesCuadrado) {
         Obstaculo *cuadrado = new Obstaculo(datosCuadrado);
-        cuadrado->setScale(0.683);
+        cuadrado->setScale(0.68359375);
         cuadrado->setBrush(QColor("#053270"));
         cuadrado->setPen(QColor("#FFFFFF"));
         cuadrado->setFlag(QGraphicsItem::ItemIsMovable);
@@ -280,10 +281,9 @@ void MainWindow::manejarBonificacionRecolectada(Bonificacion* bonificacion) {
 
     cargaSuper += 25;
 
-    /*if(cargaSuper >= 100) {
-        // Activar poder especial
-        cargaSuper = 0;
-    }*/
+    if(cargaSuper >= 100) {
+        goku->setValidoCargarSuper(true);
+    }
 
     actualizarBarraSuper();
 
@@ -316,4 +316,9 @@ void MainWindow::actualizarBarraSuper() {
 
     //mostrar solo el label correspondiente
     superBarLabels[estado]->setVisible(true);
+}
+
+void MainWindow::resetCargaSuperYActualizarBarra() {
+    cargaSuper = 0;
+    actualizarBarraSuper();
 }

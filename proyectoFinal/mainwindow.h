@@ -30,6 +30,7 @@ public:
 private slots:
     void reaparecerBonificaciones();
     void manejarBonificacionRecolectada(Bonificacion* bonificacion);
+    void resetCargaSuperYActualizarBarra();
 
 private:
     void nivel1();

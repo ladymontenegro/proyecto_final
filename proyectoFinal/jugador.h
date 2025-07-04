@@ -10,6 +10,9 @@ class Jugador : public Personaje
 
 public:
     Jugador(QPixmap _hojaSprite);
+    void setCargaSuper(unsigned short _carga);
+    unsigned short getCargaSuper();
+    void setValidoCargarSuper(bool estado);
 
 private:
     unsigned short contadorspriteMovimientoPoderGoku;
@@ -17,7 +20,7 @@ private:
     unsigned short posicionXPoderGoku;
     unsigned short cargaSuper;
     unsigned short ultimaDireccion;  // 0: derecha, 1: izquierda, 2: arriba, 3: abajo
-    bool superCargado;
+    bool validoCargarSuper;
     QPixmap hojaBarraSuper;
     QPixmap barraSuper;
     QPixmap hojaMovimientoPoderGoku;
@@ -32,11 +35,12 @@ protected:
     void movimiento(int dx, int dy);
     void iniciarMovimientoPoderGoku();
     void movimientoPoderGoku();
-    void verificarSuperCargado();
+    bool verificarSuperCargado();
     void lanzarPoderGoku();
 
 signals:
     void bonificacionRecolectada(Bonificacion* bonificacion);
+    void poderLanzado();
 };
 
 #endif // JUGADOR_H

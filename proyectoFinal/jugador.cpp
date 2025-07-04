@@ -7,15 +7,27 @@
 
 Jugador::Jugador(QPixmap _hojaSprite)
     : Personaje(_hojaSprite)
+    , cargaSuper(0)
 {
     x = 267;
     y = 271;
-    superCargado = false;
+    validoCargarSuper = false;
     setFlag(QGraphicsItem::ItemIsFocusable);
     hojaMovimientoPoderGoku.load(":/multimedia/movimientoPoderGoku.png");
     timerMovimientoPoderGoku = new QTimer(this);
     connect(timerMovimientoPoderGoku, &QTimer::timeout, this, &Jugador::movimientoPoderGoku);
     timerMovimientoPoderGoku->setInterval(100);
+}
+
+void Jugador::setValidoCargarSuper(bool estado){
+    validoCargarSuper = estado;
+}
+
+void Jugador::setCargaSuper(unsigned short _carga){
+    cargaSuper = _carga;
+}
+unsigned short Jugador::getCargaSuper(){
+    return cargaSuper;
 }
 
 //***************** MOVIMIENTO *****************
@@ -48,7 +60,12 @@ void Jugador::keyPressEvent(QKeyEvent *event)
         ultimaDireccion = 0;
         break;
     case Qt::Key_Space:
-        iniciarMovimientoPoderGoku();
+        if(validoCargarSuper){
+            iniciarMovimientoPoderGoku();
+            validoCargarSuper = false;
+            emit poderLanzado();
+            break;
+        }
         break;
     default:
         QGraphicsItem::keyPressEvent(event);
@@ -134,6 +151,7 @@ void Jugador::movimiento(int dx, int dy)
 
 void Jugador::iniciarMovimientoPoderGoku()
 {
+    cargaSuper = 0;
     contadorspriteMovimientoPoderGoku = 0; // Reinicia la animacion al inicio
     movimientoPoderGoku();                 // Muestra el primer frame inmediatamente
     timerMovimientoPoderGoku->start();     // Inicia el timer para el resto de la animacion
@@ -172,3 +190,4 @@ void Jugador::lanzarPoderGoku()
     Ataque *ataqueGoku = new Ataque(spriteEscalado, inicio, ultimaDireccion);
     scene()->addItem(ataqueGoku);
 }
+
