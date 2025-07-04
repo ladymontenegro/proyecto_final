@@ -8,5 +8,6 @@
         <file>../multimedia/barraGoku.png</file>
         <file>../multimedia/barraRoshi.png</file>
         <file>../multimedia/barraSuper.png</file>
+        <file>../multimedia/title.png</file>
     </qresource>
 </RCC>

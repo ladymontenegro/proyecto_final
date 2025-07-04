@@ -6,6 +6,8 @@
 
 class Jugador : public Personaje
 {
+    Q_OBJECT
+
 public:
     Jugador(QPixmap _hojaSprite);
 
