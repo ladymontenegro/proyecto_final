@@ -5,6 +5,10 @@
 #include <QGraphicsView>
 #include <QMainWindow>
 #include <QPixmap>
+#include <QLabel>
+#include <QHBoxLayout>
+#include "jugador.h"
+#include "bonificacion.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,13 +25,24 @@ public:
     ~MainWindow();
     void crearMurosLaberinto();
     void ubicarBonificaciones();
+    void mostrarBarraSuper(QPixmap &hojaSriteSuper);
 
 private slots:
-    void nivel1();
+    void reaparecerBonificaciones();
+    void manejarBonificacionRecolectada(Bonificacion* bonificacion);
 
 private:
+    void nivel1();
     Ui::MainWindow *ui;
+    Jugador *goku;
     QGraphicsView *view;
     QGraphicsScene *scene;
+    QTimer *timerReaparicion;
+    QList<Bonificacion*> bonificacionesRecolectadas;
+    QList<Bonificacion*> bonificacionesActivas;
+    QLabel *superBarLabels[5];
+    int cargaSuper;
+
+    void actualizarBarraSuper();
 };
 #endif // MAINWINDOW_H
