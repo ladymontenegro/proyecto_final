@@ -5,5 +5,8 @@
         <file>../multimedia/plato.png</file>
         <file>../multimedia/poderGoku.png</file>
         <file>../multimedia/movimientoPoderGoku.png</file>
+        <file>../multimedia/barraGoku.png</file>
+        <file>../multimedia/barraRoshi.png</file>
+        <file>../multimedia/barraSuper.png</file>
     </qresource>
 </RCC>
