@@ -4,5 +4,6 @@
         <file>../multimedia/goku.png</file>
         <file>../multimedia/plato.png</file>
         <file>../multimedia/poderGoku.png</file>
+        <file>../multimedia/movimientoPoderGoku.png</file>
     </qresource>
 </RCC>

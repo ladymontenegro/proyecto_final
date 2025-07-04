@@ -1,9 +1,10 @@
 #include "mainwindow.h"
-#include <QVector>
 #include <QGraphicsItem>
+#include <QVector>
 #include "QGraphicsPixmapItem"
-#include "jugador.h"
 #include "bonificacion.h"
+#include "jugador.h"
+#include "obstaculo.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -94,7 +95,7 @@ void MainWindow::crearMurosLaberinto()
     }
 
     for (const QRectF &datosCuadrado : posicionesCuadrado) {
-        QGraphicsRectItem *cuadrado = new QGraphicsRectItem(datosCuadrado);
+        Obstaculo *cuadrado = new Obstaculo(datosCuadrado);
         cuadrado->setScale(0.683);
         cuadrado->setBrush(QColor("#053270"));
         cuadrado->setPen(QColor("#FFFFFF"));
@@ -136,6 +137,6 @@ void MainWindow::nivel1()
     Jugador *goku = new Jugador(spriteGoku);
     scene->addItem(goku);
     goku->setFocus();
-    goku->setPos(187, 87);
+    goku->setPos(267, 271);
 }
 

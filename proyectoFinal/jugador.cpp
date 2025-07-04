@@ -1,21 +1,24 @@
 #include "jugador.h"
-#include <QGraphicsItem>
 #include <QDebug>
+#include <QGraphicsItem>
+#include "ataque.h"
 #include "bonificacion.h"
 #include "qgraphicsscene.h"
 
 Jugador::Jugador(QPixmap _hojaSprite)
     : Personaje(_hojaSprite)
 {
-    x = 187;
-    y = 87;
+    x = 267;
+    y = 271;
     superCargado = false;
     setFlag(QGraphicsItem::ItemIsFocusable);
-    hojaPoderGoku.load(":/multimedia/poderGoku.png");
-    timerPoderGoku = new QTimer(this);
-    connect(timerPoderGoku, &QTimer::timeout, this, &Jugador::poderGoku);
-    timerPoderGoku->setInterval(100);
+    hojaMovimientoPoderGoku.load(":/multimedia/movimientoPoderGoku.png");
+    timerMovimientoPoderGoku = new QTimer(this);
+    connect(timerMovimientoPoderGoku, &QTimer::timeout, this, &Jugador::movimientoPoderGoku);
+    timerMovimientoPoderGoku->setInterval(100);
 }
+
+//***************** MOVIMIENTO *****************
 
 void Jugador::keyPressEvent(QKeyEvent *event)
 {
@@ -45,7 +48,7 @@ void Jugador::keyPressEvent(QKeyEvent *event)
         ultimaDireccion = 0;
         break;
     case Qt::Key_Space:
-        iniciarPoderGoku();
+        iniciarMovimientoPoderGoku();
         break;
     default:
         QGraphicsItem::keyPressEvent(event);
@@ -129,59 +132,48 @@ void Jugador::movimiento(int dx, int dy)
     }
 }
 
-void Jugador::iniciarPoderGoku()
+//***************** PODER *****************
+
+void Jugador::iniciarMovimientoPoderGoku()
 {
-    contadorSpritePoderGoku = 0; // Reinicia la animacion al inicio
-    poderGoku();                 // Muestra el primer frame inmediatamente
-    timerPoderGoku->start();     // Inicia el timer para el resto de la animacion
+    contadorspriteMovimientoPoderGoku = 0; // Reinicia la animacion al inicio
+    movimientoPoderGoku();                 // Muestra el primer frame inmediatamente
+    timerMovimientoPoderGoku->start();     // Inicia el timer para el resto de la animacion
 }
 
-void Jugador::poderGoku()
+void Jugador::movimientoPoderGoku()
 {
-    if (contadorSpritePoderGoku <= 7) {
-        //determina medidas
-        int ancho = 66;
-        int posicionPoderX = 0;
-
-        if (contadorSpritePoderGoku == 6) {
-            ancho = 283;
-            posicionPoderX = 410;
-        } else if (contadorSpritePoderGoku == 7) {
-            ancho = 283;
-            posicionPoderX = 693;
-        } else {
-            posicionPoderX = contadorSpritePoderGoku * ancho;
-        }
-
-        QPointF posicionActual = pos();
-
-        spritePoderGoku = hojaPoderGoku.copy(posicionPoderX, 0, ancho, 128);
-        QPixmap spriteEscalado;
-
-        if (ancho == 283) {
-            spriteEscalado = spritePoderGoku.scaled(70, 32);
-        } else {
-            spriteEscalado = spritePoderGoku.scaled(22, 32);
-        }
+    if (contadorspriteMovimientoPoderGoku <= 6) {
+        posicionXPoderGoku = 0;
+        anchoSpriteMovimientoPoderGoku = 66; // Ancho por defecto
+        posicionXPoderGoku = contadorspriteMovimientoPoderGoku * anchoSpriteMovimientoPoderGoku;
+        spriteMovimientoPoderGoku = hojaMovimientoPoderGoku.copy(posicionXPoderGoku,
+                                                                 0,
+                                                                 anchoSpriteMovimientoPoderGoku,
+                                                                 128);
+        QPixmap spriteEscalado = spriteMovimientoPoderGoku.scaled(22, 32);
 
         //espejar el sprite
         if (ultimaDireccion == 1) {
             spriteEscalado = spriteEscalado.transformed(QTransform().scale(-1, 1));
         }
-        setPixmap(spriteEscalado);
-        if (ultimaDireccion == 1) {
-            //calcular diferencia de anchos
-            qreal anchoActual = boundingRect().width(); //este es el sprite antes de cambiar al otro
-            qreal nuevoAncho = (ancho == 283) ? 70 : 22; //este es el del proximo, si no es de los ultimos, no habra diferencia
-            qreal diferencia = nuevoAncho - anchoActual;
 
-            //mover el personaje a la derecha para compensar
-            setPos(posicionActual.x() - diferencia, posicionActual.y());
-        }
-        contadorSpritePoderGoku++;
+        setPixmap(spriteEscalado);
+        contadorspriteMovimientoPoderGoku++;
 
     } else {
-        timerPoderGoku->stop();
+        timerMovimientoPoderGoku->stop();
+        lanzarPoderGoku();
         mostrarSpriteQuieto();
     }
+}
+
+void Jugador::lanzarPoderGoku()
+{
+    QPointF inicio = {ultimaDireccion != 1 ? x + 20 : x - 20, y + 4};
+    QPixmap sprite(":/multimedia/poderGoku.png");
+    QPixmap spriteEscalado = sprite.scaled(30, 20);
+
+    Ataque *ataqueGoku = new Ataque(spriteEscalado, inicio, ultimaDireccion);
+    scene()->addItem(ataqueGoku);
 }

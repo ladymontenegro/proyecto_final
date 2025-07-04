@@ -9,17 +9,17 @@ public:
     Jugador(QPixmap _hojaSprite);
 
 private:
-    unsigned short contadorSpritePoderGoku;
-    unsigned short anchoSpritePoderGoku;
+    unsigned short contadorspriteMovimientoPoderGoku;
+    unsigned short anchoSpriteMovimientoPoderGoku;
     unsigned short posicionXPoderGoku;
     unsigned short cargaSuper;
     unsigned short ultimaDireccion;  // 0: derecha, 1: izquierda, 2: arriba, 3: abajo
     bool superCargado;
     QPixmap hojaBarraSuper;
     QPixmap barraSuper;
-    QPixmap hojaPoderGoku;
-    QPixmap spritePoderGoku;
-    QTimer *timerPoderGoku;
+    QPixmap hojaMovimientoPoderGoku;
+    QPixmap spriteMovimientoPoderGoku;
+    QTimer *timerMovimientoPoderGoku;
     QList<int> teclasPresionadas;
 
 protected:
@@ -27,9 +27,10 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void mostrarSpriteQuieto();
     void movimiento(int dx, int dy);
-    void iniciarPoderGoku();
-    void poderGoku();
+    void iniciarMovimientoPoderGoku();
+    void movimientoPoderGoku();
     void verificarSuperCargado();
+    void lanzarPoderGoku();
 };
 
 #endif // JUGADOR_H
