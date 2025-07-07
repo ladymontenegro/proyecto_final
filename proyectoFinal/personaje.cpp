@@ -1,7 +1,8 @@
 #include "personaje.h"
 #include <QDebug>
 #include <QGraphicsScene>
-
+#include <QMessageBox>
+#include "jugador.h"
 #include "obstaculo.h"
 
 Personaje::Personaje(QPixmap _hojaSprite)
@@ -55,4 +56,14 @@ void Personaje::movimientoSpriteYajirobe()
             break;
         }
     }
+}
+bool Personaje::verificarVictoriaNivel1()
+{
+    QList<QGraphicsItem *> itemsChocados = collidingItems();
+    for (QGraphicsItem *item : itemsChocados) {
+        if (dynamic_cast<Jugador *>(item)) {
+            return true;
+        }
+    }
+    return false;
 }

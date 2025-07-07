@@ -12,6 +12,7 @@ public:
     short direccionXYajirobe;
 
     void movimientoSpriteYajirobe();
+    bool verificarVictoriaNivel1();
 
 protected:
     qreal x;
