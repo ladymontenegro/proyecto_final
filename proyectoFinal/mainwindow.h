@@ -23,9 +23,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void crearMurosLaberinto();
-    void ubicarBonificaciones();
-    void mostrarBarraSuper(QPixmap &hojaSriteSuper);
 
 private slots:
     void reaparecerBonificaciones();
@@ -34,10 +31,13 @@ private slots:
 
 private:
     void nivel1();
+    void nivel2();
     Ui::MainWindow *ui;
     Jugador *goku;
     QGraphicsView *view;
     QGraphicsScene *scene;
+    QWidget *centralWidget;
+    QVBoxLayout *mainLayout;
     QTimer *timerReaparicion;
     QList<Bonificacion*> bonificacionesRecolectadas;
     QList<Bonificacion*> bonificacionesActivas;
@@ -45,5 +45,9 @@ private:
     int cargaSuper;
 
     void actualizarBarraSuper();
+    void crearBloquesCuadrado();
+    void crearMurosLaberinto();
+    void ubicarBonificaciones();
+    void mostrarBarraSuper(QPixmap &hojaSriteSuper);
 };
 #endif // MAINWINDOW_H

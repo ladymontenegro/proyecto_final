@@ -10,8 +10,6 @@ class Jugador : public Personaje
 
 public:
     Jugador(QPixmap _hojaSprite);
-    void setCargaSuper(unsigned short _carga);
-    unsigned short getCargaSuper();
     void setValidoCargarSuper(bool estado);
 
 private:
@@ -21,8 +19,6 @@ private:
     unsigned short cargaSuper;
     unsigned short ultimaDireccion;  // 0: derecha, 1: izquierda, 2: arriba, 3: abajo
     bool validoCargarSuper;
-    QPixmap hojaBarraSuper;
-    QPixmap barraSuper;
     QPixmap hojaMovimientoPoderGoku;
     QPixmap spriteMovimientoPoderGoku;
     QTimer *timerMovimientoPoderGoku;

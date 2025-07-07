@@ -1,5 +1,6 @@
 #include "personaje.h"
 #include <QDebug>
+#include <QGraphicsScene>
 #include <QMessageBox>
 #include "jugador.h"
 #include "obstaculo.h"
