@@ -348,6 +348,19 @@ void MainWindow::resetCargaSuperYActualizarBarra() {
     actualizarBarraSuper();
 }
 
+void MainWindow::nivel2(){
+    //CONFIGURAR LA VISTA
+    resize(1000, 600);
+
+    QPixmap imagenCueva(":/multimedia/cueva.png");
+    QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
+    cueva->setZValue(-100);
+    scene->addItem(cueva);
+    scene->setSceneRect(cueva->boundingRect());
+    mainLayout->addWidget(view);
+    view->setFixedSize(1000, 600);
+}
+
 
 
 
