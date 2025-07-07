@@ -23,13 +23,6 @@ void Jugador::setValidoCargarSuper(bool estado){
     validoCargarSuper = estado;
 }
 
-void Jugador::setCargaSuper(unsigned short _carga){
-    cargaSuper = _carga;
-}
-unsigned short Jugador::getCargaSuper(){
-    return cargaSuper;
-}
-
 //***************** MOVIMIENTO *****************
 
 void Jugador::keyPressEvent(QKeyEvent *event)

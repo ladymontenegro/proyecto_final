@@ -1,5 +1,7 @@
 #include "personaje.h"
 #include <QDebug>
+#include <QGraphicsScene>
+
 #include "obstaculo.h"
 
 Personaje::Personaje(QPixmap _hojaSprite)

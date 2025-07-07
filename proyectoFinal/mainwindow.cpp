@@ -21,13 +21,49 @@ MainWindow::MainWindow(QWidget *parent)
     //los widgets son como los contenedores y lo layouts como delimitadores para organizar
 
     //el espcio central, va a contener a todo
-    QWidget *centralWidget = new QWidget(this);
+    centralWidget = new QWidget(this);
     setCentralWidget(centralWidget); //se pone como area principal
 
     //es un layout vertical que va en el centraWidget, controla el espacio de arriba a abajo
-    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+    mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0, 0, 0, 0);
+
+    //se crea la escena
+    scene = new QGraphicsScene(this);
+
+    //se crea la vista y le damos color
+    view = new QGraphicsView(scene, this);
+
+    //quitar barras de desplazamiento
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    nivel1();
+}
+
+MainWindow::~MainWindow()
+{
+    // Limpiar listas de bonificaciones
+    for(Bonificacion* b : bonificacionesActivas) {
+        scene->removeItem(b);
+        delete b;
+    }
+    bonificacionesActivas.clear();
+
+    for(Bonificacion* b : bonificacionesRecolectadas) {
+        delete b;
+    }
+    bonificacionesRecolectadas.clear();
+    delete ui;
+}
+
+//METODOS PARA LA CARGA DEL NIVEL UNO
+void MainWindow::nivel1()
+{
+    //CONFIGURAR LA VENTANA
+
+    resize(650, 710);
 
     //este sera el contenedor donde ira lo de la barra
     QWidget *superBarContainer = new QWidget(this);
@@ -43,17 +79,6 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *barraLayout = new QHBoxLayout();
     barraLayout->setSpacing(0);
     barraLayout->setContentsMargins(0, 0, 0, 0);
-
-    //se crea la escen
-    scene = new QGraphicsScene(this);
-    //scene->setSceneRect(0, 0, 650, 650);
-
-    //se crea la vista y le damos color
-    view = new QGraphicsView(scene, this);
-
-    //quitar barras de desplazamiento
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     //al contenedor principal le agregamos el widget de la barra y la vista
     mainLayout->addWidget(superBarContainer);
@@ -92,36 +117,6 @@ MainWindow::MainWindow(QWidget *parent)
     //inicializar barra
     actualizarBarraSuper();
 
-    /*
-    //esto es para visualizar los bordes de las cosas
-    superBarContainer->setStyleSheet("background-color: #0073ce; border: 2px dashed blue;");
-    centralWidget->setStyleSheet("border: 2px dashed yellow;");
-    view->setStyleSheet("border: 2px solid red;");*/
-
-    resize(650, 710);
-
-    nivel1();
-}
-
-MainWindow::~MainWindow()
-{
-    // Limpiar listas de bonificaciones
-    for(Bonificacion* b : bonificacionesActivas) {
-        scene->removeItem(b);
-        delete b;
-    }
-    bonificacionesActivas.clear();
-
-    for(Bonificacion* b : bonificacionesRecolectadas) {
-        delete b;
-    }
-    bonificacionesRecolectadas.clear();
-    delete ui;
-}
-
-//METODOS PARA LA CARGA DEL NIVEL UNO
-void MainWindow::nivel1()
-{
     //ELEMENTOS DE LA ESCENA
     //crear el laberinto
     QPixmap imagenLaberinto(":/multimedia/laberinto.png");
@@ -131,13 +126,27 @@ void MainWindow::nivel1()
     scene->addItem(laberinto);
     scene->setSceneRect(laberinto->boundingRect());
     crearMurosLaberinto();
+    crearBloquesCuadrado();
 
-    //agregar al jugador
+    //AGREGAR PERSONAJES
+    //agregar a Goku
     QPixmap spriteGoku(":/multimedia/goku.png");
     goku = new Jugador(spriteGoku);
     scene->addItem(goku);
     goku->setFocus();
     goku->setPos(267, 271);
+
+    //agregar a Yajirobe
+    QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
+    Personaje *yajirobe = new Personaje(spriteYajirobe);
+    yajirobe->direccionXYajirobe = -3;
+    scene->addItem(yajirobe);
+    yajirobe->setPos(350, 330);
+
+    //Timer para que se mueva solo
+    QTimer *timerYajirobe = new QTimer(yajirobe);
+    QObject::connect(timerYajirobe, &QTimer::timeout, [=]() {yajirobe->movimientoSpriteYajirobe();});
+    timerYajirobe->start(100);
 
     //cargar las bonificaciones y señales
     timerReaparicion = new QTimer(this);
@@ -146,20 +155,6 @@ void MainWindow::nivel1()
     connect(goku, &Jugador::bonificacionRecolectada, this, &MainWindow::manejarBonificacionRecolectada);
     connect(goku, &Jugador::poderLanzado, this, &MainWindow::resetCargaSuperYActualizarBarra);
     ubicarBonificaciones();
-
-    // Agregar a Yajirobe
-    QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
-    Personaje *yajirobe = new Personaje(spriteYajirobe);
-    yajirobe->direccionXYajirobe = -3;
-    scene->addItem(yajirobe);
-    yajirobe->setPos(350, 330);
-
-    // Timer para que se mueva solo
-    QTimer *timerYajirobe = new QTimer(yajirobe);
-    QObject::connect(timerYajirobe, &QTimer::timeout, [=]() {
-        yajirobe->movimientoSpriteYajirobe();
-    });
-    timerYajirobe->start(100);
 }
 
 void MainWindow::crearMurosLaberinto()
@@ -217,11 +212,6 @@ void MainWindow::crearMurosLaberinto()
             {0, 1016, 1024, 12}
         };
 
-    QVector<QRectF> posicionesCuadrado
-        = {{482, 462, 20, 20}, {502, 462, 20, 20},{522, 462, 20, 20}, {542, 462, 20, 20},
-           {482, 482, 20, 20}, {482, 502, 20, 20}, {482, 522, 20, 20}, {542, 482, 20, 20},
-           {542, 502, 20, 20}, {542, 522, 20, 20}, {502, 522, 20, 20}, {522, 522, 20, 20}};
-
     for (const QRectF &datosMuros : posicionesMuros) {
         QGraphicsRectItem *muro = new QGraphicsRectItem(datosMuros);
         muro->setScale(0.68359375);
@@ -230,8 +220,15 @@ void MainWindow::crearMurosLaberinto()
         //muro->setPen(QColor("#FFFFFF"));
         scene->addItem(muro);
     }
+}
 
-    for (const QRectF &datosCuadrado : posicionesCuadrado) {
+void MainWindow::crearBloquesCuadrado(){
+    QVector<QRectF> posicionesCuadrado
+        = {{482, 462, 20, 20}, {502, 462, 20, 20},{522, 462, 20, 20}, {542, 462, 20, 20},
+           {482, 482, 20, 20}, {482, 502, 20, 20}, {482, 522, 20, 20}, {542, 482, 20, 20},
+           {542, 502, 20, 20}, {542, 522, 20, 20}, {502, 522, 20, 20}, {522, 522, 20, 20}};
+
+    for (const QRectF& datosCuadrado : posicionesCuadrado) {
         Obstaculo *cuadrado = new Obstaculo(datosCuadrado);
         cuadrado->setScale(0.68359375);
         cuadrado->setBrush(QColor("#053270"));
@@ -335,3 +332,22 @@ void MainWindow::resetCargaSuperYActualizarBarra() {
     cargaSuper = 0;
     actualizarBarraSuper();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
