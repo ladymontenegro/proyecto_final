@@ -29,7 +29,7 @@ protected:
     unsigned int conteoSprite;
     unsigned int cargaVida;
 
-    void movimientoSprite(int direccion);
+    void movimientoSprite(int direccion, unsigned short cantidadDeSprites);
 };
 
 #endif // PERSONAJE_H

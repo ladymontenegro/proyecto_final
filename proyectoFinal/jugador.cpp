@@ -34,22 +34,22 @@ void Jugador::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
     case Qt::Key_A:
         movimiento(-5, 0);
-        movimientoSprite(2496);
+        movimientoSprite(2496, 8);
         ultimaDireccion = 1;
         break;
     case Qt::Key_W:
         movimiento(0, -5);
-        movimientoSprite(2432);
+        movimientoSprite(2432, 8);
         ultimaDireccion = 2;
         break;
     case Qt::Key_S:
         movimiento(0, 5);
-        movimientoSprite(2560);
+        movimientoSprite(2560, 8);
         ultimaDireccion = 3;
         break;
     case Qt::Key_D:
         movimiento(5, 0);
-        movimientoSprite(2624);
+        movimientoSprite(2624 8);
         ultimaDireccion = 0;
         break;
     case Qt::Key_Space:
@@ -184,3 +184,86 @@ void Jugador::lanzarPoderGoku()
     scene()->addItem(ataqueGoku);
 }
 
+//***************** MOVIMIENTO NIVEL II *****************
+
+void Jugador::keyPressEventNivel2(QKeyEvent *event)
+{
+    if (!teclasPresionadas.contains(event->key())) {
+        teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
+    }
+
+    switch (event->key()) {
+    case Qt::Key_A:
+        movimiento(-5, 0);
+        movimientoSprite(2496, 8);
+        ultimaDireccion = 1;
+        break;
+    case Qt::Key_W:
+        movimiento(0, -5);
+        movimientoSprite(1856, 5);
+        ultimaDireccion = 2;
+        break;
+    case Qt::Key_S:
+        movimiento(0, 5);
+        movimientoSprite(2560, 8);
+        ultimaDireccion = 3;
+        break;
+    case Qt::Key_D:
+        movimiento(5, 0);
+        movimientoSprite(2624, 8);
+        ultimaDireccion = 0;
+        break;
+    case Qt::Key_Space:
+        if (validoCargarSuper) {
+            iniciarMovimientoPoderGoku();
+            validoCargarSuper = false;
+            emit poderLanzado();
+            break;
+        }
+        break;
+    default:
+        QGraphicsItem::keyPressEvent(event);
+        break;
+    }
+}
+
+void Jugador::movimientoNivel2(int dx, int dy)
+{
+    //posicion actual antes de intentar el movimiento
+    qreal oldX = x;
+    qreal oldY = y;
+
+    //intenta mover al jugador
+    setPos(x + dx, y + dy);
+
+    //actualiza la nueva posicion
+    x = pos().x();
+    y = pos().y();
+
+    // Obtener rectangulo del jugador en coordenadas de escena
+    QRectF gokuRect = boundingRect().translated(pos());
+
+    //bool sobrePlataforma = false;
+
+    for (QGraphicsItem *item : collidingItems()) {
+        if (item->type() == QGraphicsRectItem::Type) {
+            QRectF plataformaRect = item->boundingRect().translated(item->pos());
+
+            // Validacion colision desde arriba
+            bool colisionDesdeArriba = gokuRect.bottom() > plataformaRect.top()
+                                       && gokuRect.bottom() < plataformaRect.top() + 10
+                                       && // tolerancia
+                                       gokuRect.right() > plataformaRect.left()
+                                       && gokuRect.left() < plataformaRect.right()
+                                       && dy > 0; // Si esta cayendo
+
+            if (colisionDesdeArriba) {
+                // Aterriza sobre la plataforma
+                setPos(x, plataformaRect.top() - altoSprite);
+                dy = 0;
+                //sobrePlataforma = true;
+                break;
+            }
+        }
+    }
+}

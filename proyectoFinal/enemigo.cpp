@@ -1,3 +1,5 @@
-//#include "enemigo.h"
+#include "enemigo.h"
 
-//Enemigo::Enemigo() {}
+Enemigo::Enemigo(QPixmap _hojaSprite)
+    : Personaje(_hojaSprite)
+{}

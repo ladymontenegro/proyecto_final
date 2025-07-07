@@ -18,7 +18,7 @@ Personaje::Personaje(QPixmap _hojaSprite)
     setPixmap(spriteEscalado);
 }
 
-void Personaje::movimientoSprite(int direccion)
+void Personaje::movimientoSprite(int direccion, unsigned short cantidadDeSprites)
 {
     posicionY = direccion;
     posicionX = anchoSprite * conteoSprite;
@@ -27,7 +27,7 @@ void Personaje::movimientoSprite(int direccion)
     setPixmap(spriteEscalado);
     conteoSprite++;
 
-    if (conteoSprite == 8) {
+    if (conteoSprite == cantidadDeSprites) {
         conteoSprite = 0;
     }
 }

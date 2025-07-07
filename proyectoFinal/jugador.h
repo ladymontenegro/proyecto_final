@@ -26,9 +26,11 @@ private:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void keyPressEventNivel2(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event) override;
     void mostrarSpriteQuieto();
     void movimiento(int dx, int dy);
+    void movimientoNivel2(int dx, int dy);
     void iniciarMovimientoPoderGoku();
     void movimientoPoderGoku();
     bool verificarSuperCargado();
