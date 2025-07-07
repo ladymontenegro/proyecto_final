@@ -1,5 +1,6 @@
 #include "personaje.h"
 #include <QDebug>
+#include "obstaculo.h"
 
 Personaje::Personaje(QPixmap _hojaSprite)
     : hojaSprite(_hojaSprite)
@@ -25,5 +26,31 @@ void Personaje::movimientoSprite(int direccion)
 
     if (conteoSprite == 8) {
         conteoSprite = 0;
+    }
+}
+
+void Personaje::movimientoSpriteYajirobe()
+{
+    posicionY = 0;
+    posicionX = 63 * conteoSprite;
+
+    conteoSprite++;
+
+    if (conteoSprite == 2)
+        conteoSprite = 0;
+
+    QPointF posActual = pos();
+    setPos(posActual.x() + direccionXYajirobe, posActual.y());
+
+    QList<QGraphicsItem *> itemsChocados = collidingItems();
+    for (QGraphicsItem *item : itemsChocados) {
+        if (dynamic_cast<Obstaculo *>(item)) {
+            // Invertir direccion
+            direccionXYajirobe *= -1;
+            sprite = sprite.transformed(QTransform().scale(-1, 1));
+            QPixmap spriteEscalado = sprite.scaled(22, 22);
+            setPixmap(spriteEscalado);
+            break;
+        }
     }
 }

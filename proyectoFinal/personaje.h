@@ -9,6 +9,9 @@ class Personaje : public QObject, public QGraphicsPixmapItem
     Q_OBJECT
 public:
     Personaje(QPixmap _hojaSprite);
+    short direccionXYajirobe;
+
+    void movimientoSpriteYajirobe();
 
 protected:
     qreal x;

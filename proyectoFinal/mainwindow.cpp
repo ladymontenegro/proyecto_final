@@ -147,6 +147,19 @@ void MainWindow::nivel1()
     connect(goku, &Jugador::poderLanzado, this, &MainWindow::resetCargaSuperYActualizarBarra);
     ubicarBonificaciones();
 
+    // Agregar a Yajirobe
+    QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
+    Personaje *yajirobe = new Personaje(spriteYajirobe);
+    yajirobe->direccionXYajirobe = -3;
+    scene->addItem(yajirobe);
+    yajirobe->setPos(350, 330);
+
+    // Timer para que se mueva solo
+    QTimer *timerYajirobe = new QTimer(yajirobe);
+    QObject::connect(timerYajirobe, &QTimer::timeout, [=]() {
+        yajirobe->movimientoSpriteYajirobe();
+    });
+    timerYajirobe->start(100);
 }
 
 void MainWindow::crearMurosLaberinto()
