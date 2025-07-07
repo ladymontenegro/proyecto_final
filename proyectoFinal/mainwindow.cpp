@@ -1,13 +1,13 @@
 #include "mainwindow.h"
-#include <QVector>
 #include <QGraphicsItem>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QVBoxLayout>
+#include <QVector>
 #include "QGraphicsPixmapItem"
-#include "jugador.h"
 #include "bonificacion.h"
+#include "jugador.h"
 #include "obstaculo.h"
 #include "ui_mainwindow.h"
 
@@ -101,6 +101,11 @@ MainWindow::MainWindow(QWidget *parent)
     resize(650, 710);
 
     nivel1();
+
+    QMessageBox::information(nullptr,
+                             "NIVEL 1",
+                             "!!Yajirobe esta atrapado!!\nAumenta tu super con comida y utiliza tu "
+                             "poder para rescatar a Yajirobe");
 }
 
 MainWindow::~MainWindow()
@@ -160,6 +165,17 @@ void MainWindow::nivel1()
         yajirobe->movimientoSpriteYajirobe();
     });
     timerYajirobe->start(100);
+
+    // Timer para que verificar la victoria del nivel 1
+    QTimer *timerVictoria = new QTimer(this);
+    connect(timerVictoria, &QTimer::timeout, [=]() {
+        if (yajirobe->verificarVictoriaNivel1()) {
+            timerVictoria->stop(); // Detiene el timer al ganar
+            timerYajirobe->stop();
+            QMessageBox::information(this, "¡¡VICTORIA!!", "¡Has rescatado a Yajirobe!");
+        }
+    });
+    timerVictoria->start(100); // chequear cada 100 ms
 }
 
 void MainWindow::crearMurosLaberinto()
