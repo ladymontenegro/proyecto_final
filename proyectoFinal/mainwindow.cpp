@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QVector>
+#include <QGraphicsProxyWidget>
 #include "QGraphicsPixmapItem"
 #include "bonificacion.h"
 #include "jugador.h"
@@ -39,11 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    nivel1();
-    QMessageBox::information(nullptr,
-                             "NIVEL 1",
-                             "!!Yajirobe esta atrapado!!\nAumenta tu super con comida y utiliza tu "
-                             "poder para rescatar a Yajirobe");
+    //nivel1();
+    nivel2();
 }
 
 MainWindow::~MainWindow()
@@ -67,7 +65,7 @@ void MainWindow::nivel1()
 {
     //CONFIGURAR LA VENTANA
 
-    resize(650, 710);
+    resize(700, 700);
 
     //este sera el contenedor donde ira lo de la barra
     QWidget *superBarContainer = new QWidget(this);
@@ -170,6 +168,9 @@ void MainWindow::nivel1()
         }
     });
     timerVictoria->start(100); // chequear cada 100 ms
+
+    QMessageBox::information(nullptr, "NIVEL 1", "!!Yajirobe esta atrapado!!\nAumenta tu super con comida y utiliza tu "
+                                                 "poder para rescatar a Yajirobe");
 }
 
 void MainWindow::crearMurosLaberinto()
@@ -352,13 +353,87 @@ void MainWindow::nivel2(){
     //CONFIGURAR LA VISTA
     resize(1000, 600);
 
+    /*
+    QWidget *lifeBarContainer = new QWidget();
+    lifeBarContainer->setFixedHeight(50); //le damos altura
+    lifeBarContainer->setStyleSheet("background-color: #6d2045;");
+
+    QHBoxLayout *lifeBarLayout = new QHBoxLayout(lifeBarContainer);
+    lifeBarLayout->setSpacing(350);
+    lifeBarLayout->setContentsMargins(10, 5, 40, 5);
+
+    QHBoxLayout *barraGokuLayout = new QHBoxLayout();
+    barraGokuLayout->setSpacing(0);
+    barraGokuLayout->setContentsMargins(0, 0, 0, 0);
+
+    QHBoxLayout *barraRoshiLayout = new QHBoxLayout();
+    barraRoshiLayout->setSpacing(0);
+    barraRoshiLayout->setContentsMargins(0, 0, 0, 0);
+
+
+    QPixmap imagenRoshi(":multimedia/barraRoshi.png");
+    for(int i = 0; i < 5; i++) {
+        lifeBarRoshiLabels[i] = new QLabel(lifeBarContainer);
+        lifeBarRoshiLabels[i]->setFixedSize(200, 40); // Tamaño fijo
+
+        // Obtener el sprite correspondiente
+        int y = i * 100;
+        QPixmap sprite = imagenRoshi.copy(0, y, 500, 100);
+        QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        lifeBarRoshiLabels[i]->setPixmap(scaled);
+        lifeBarRoshiLabels[i]->setVisible(false); // Inicialmente ocultos
+        barraRoshiLayout->addWidget(lifeBarRoshiLabels[i]);
+    }
+
+    QPixmap imagenGoku(":multimedia/barraGoku.png");
+    for(int i = 0; i < 5; i++) {
+        lifeBarGokuLabels[i] = new QLabel(lifeBarContainer);
+        lifeBarGokuLabels[i]->setFixedSize(200, 40); // Tamaño fijo
+
+        // Obtener el sprite correspondiente
+        int y = i * 100;
+        QPixmap sprite = imagenGoku.copy(0, y, 500, 100);
+        QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        lifeBarGokuLabels[i]->setPixmap(scaled);
+        lifeBarGokuLabels[i]->setVisible(false); // Inicialmente ocultos
+        barraRoshiLayout->addWidget(lifeBarGokuLabels[i]);
+    }
+
+    lifeBarLayout->addStretch();
+    lifeBarLayout->addWidget(lifeBarGokuLabels);
+    lifeBarLayout->addWidget(lifeBarRoshiLabels);
+    lifeBarLayout->addStretch();
+
+    QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
+    proxyWidget->setWidget(lifeBarContainer);
+    scene->addItem(proxyWidget);
+    proxyWidget->setPos(100, 100);*/
+
     QPixmap imagenCueva(":/multimedia/cueva.png");
     QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
     cueva->setZValue(-100);
     scene->addItem(cueva);
     scene->setSceneRect(cueva->boundingRect());
     mainLayout->addWidget(view);
+    crearPlataformas();
     view->setFixedSize(1000, 600);
+}
+
+void MainWindow::crearPlataformas(){
+    QVector<QRectF> posicionesPlataformas = {
+    {0, 296, 312, 32}, {0, 384, 236, 32}, {0, 468, 400, 32},
+    {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}};
+
+    for(auto &datosPlataforma : posicionesPlataformas){
+        QGraphicsRectItem *plataforma = new QGraphicsRectItem(datosPlataforma);
+        plataforma->setBrush(QColor("#6d2045"));
+        plataforma->setPen(QColor("#FFFFFF"));
+        plataforma->setFlag(QGraphicsItem::ItemIsMovable);
+        plataforma->setOpacity(0.5);
+        scene->addItem(plataforma);
+    }
 }
 
 

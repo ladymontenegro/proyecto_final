@@ -42,11 +42,14 @@ private:
     QList<Bonificacion*> bonificacionesRecolectadas;
     QList<Bonificacion*> bonificacionesActivas;
     QLabel *superBarLabels[5];
+    QLabel *lifeBarGokuLabels[5];
+    QLabel *lifeBarRoshiLabels[5];
     int cargaSuper;
 
     void actualizarBarraSuper();
     void crearBloquesCuadrado();
     void crearMurosLaberinto();
+    void crearPlataformas();
     void ubicarBonificaciones();
     void mostrarBarraSuper(QPixmap &hojaSriteSuper);
 };
