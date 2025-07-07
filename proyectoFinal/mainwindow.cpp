@@ -133,17 +133,18 @@ void MainWindow::nivel1()
     //AGREGAR PERSONAJES
     //agregar a Goku
     QPixmap spriteGoku(":/multimedia/goku.png");
-    goku = new Jugador(spriteGoku);
+    goku = new Jugador(spriteGoku, 267, 271, 64, 64, 22, 22);
+    goku->controlesNivel2Activos = false;
     scene->addItem(goku);
     goku->setFocus();
-    goku->setPos(267, 271);
+    goku->setPos(goku->x, goku->y);
 
     //agregar a Yajirobe
     QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
-    Personaje *yajirobe = new Personaje(spriteYajirobe);
+    Personaje *yajirobe = new Personaje(spriteYajirobe, 350, 330, 63, 48, 25, 25);
     yajirobe->direccionXYajirobe = -3;
     scene->addItem(yajirobe);
-    yajirobe->setPos(350, 330);
+    yajirobe->setPos(yajirobe->x, yajirobe->y);
 
     //Timer para que se mueva solo
     QTimer *timerYajirobe = new QTimer(yajirobe);
@@ -419,6 +420,15 @@ void MainWindow::nivel2(){
     mainLayout->addWidget(view);
     crearPlataformas();
     view->setFixedSize(1000, 600);
+
+    //AGREGAR PERSONAJES
+    //agregar a Goku
+    QPixmap spriteGoku(":/multimedia/goku.png");
+    goku = new Jugador(spriteGoku, 267, 240, 64, 64, 50, 50);
+    scene->addItem(goku);
+    goku->controlesNivel2Activos = true;
+    goku->setFocus();
+    goku->setPos(goku->x, goku->y);
 }
 
 void MainWindow::crearPlataformas(){

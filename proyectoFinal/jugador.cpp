@@ -5,12 +5,22 @@
 #include "bonificacion.h"
 #include "qgraphicsscene.h"
 
-Jugador::Jugador(QPixmap _hojaSprite)
-    : Personaje(_hojaSprite)
+Jugador::Jugador(QPixmap _hojaSprite,
+                 unsigned short _x,
+                 unsigned short _y,
+                 unsigned short _anchoSprite,
+                 unsigned short _altoSprite,
+                 unsigned short _anchoSpriteEscalar,
+                 unsigned short _altoSpriteEscalar)
+    : Personaje(_hojaSprite,
+                _x,
+                _y,
+                _anchoSprite,
+                _altoSprite,
+                _anchoSpriteEscalar,
+                _altoSpriteEscalar)
     , cargaSuper(0)
 {
-    x = 267;
-    y = 271;
     validoCargarSuper = false;
     setFlag(QGraphicsItem::ItemIsFocusable);
     hojaMovimientoPoderGoku.load(":/multimedia/movimientoPoderGoku.png");
@@ -27,42 +37,77 @@ void Jugador::setValidoCargarSuper(bool estado){
 
 void Jugador::keyPressEvent(QKeyEvent *event)
 {
-    if (!teclasPresionadas.contains(event->key())) {
-        teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
-    }
+    if (!controlesNivel2Activos) {
+        if (!teclasPresionadas.contains(event->key())) {
+            teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
+        }
 
-    switch (event->key()) {
-    case Qt::Key_A:
-        movimiento(-5, 0);
-        movimientoSprite(2496, 8);
-        ultimaDireccion = 1;
-        break;
-    case Qt::Key_W:
-        movimiento(0, -5);
-        movimientoSprite(2432, 8);
-        ultimaDireccion = 2;
-        break;
-    case Qt::Key_S:
-        movimiento(0, 5);
-        movimientoSprite(2560, 8);
-        ultimaDireccion = 3;
-        break;
-    case Qt::Key_D:
-        movimiento(5, 0);
-        movimientoSprite(2624 8);
-        ultimaDireccion = 0;
-        break;
-    case Qt::Key_Space:
-        if(validoCargarSuper){
-            iniciarMovimientoPoderGoku();
-            validoCargarSuper = false;
-            emit poderLanzado();
+        switch (event->key()) {
+        case Qt::Key_A:
+            movimiento(-5, 0);
+            movimientoSprite(2496, 8);
+            ultimaDireccion = 1;
+            break;
+        case Qt::Key_W:
+            movimiento(0, -5);
+            movimientoSprite(2432, 8);
+            ultimaDireccion = 2;
+            break;
+        case Qt::Key_S:
+            movimiento(0, 5);
+            movimientoSprite(2560, 8);
+            ultimaDireccion = 3;
+            break;
+        case Qt::Key_D:
+            movimiento(5, 0);
+            movimientoSprite(2624, 8);
+            ultimaDireccion = 0;
+            break;
+        case Qt::Key_Space:
+            if (validoCargarSuper) {
+                iniciarMovimientoPoderGoku();
+                validoCargarSuper = false;
+                emit poderLanzado();
+                break;
+            }
+            break;
+        default:
+            QGraphicsItem::keyPressEvent(event);
             break;
         }
-        break;
-    default:
-        QGraphicsItem::keyPressEvent(event);
-        break;
+    } else if (controlesNivel2Activos) {
+        if (!teclasPresionadas.contains(event->key())) {
+            teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
+        }
+
+        switch (event->key()) {
+        case Qt::Key_A:
+            movimientoNivel2(-5, 0);
+            movimientoSprite(2496, 8);
+            ultimaDireccion = 1;
+            break;
+        case Qt::Key_W:
+            movimientoNivel2(0, -5);
+            movimientoSprite(1856, 5);
+            ultimaDireccion = 2;
+            break;
+        case Qt::Key_S:
+            movimientoNivel2(0, 5);
+            movimientoSprite(2560, 8);
+            ultimaDireccion = 3;
+            break;
+        case Qt::Key_D:
+            movimientoNivel2(5, 0);
+            movimientoSprite(2624, 8);
+            ultimaDireccion = 0;
+            break;
+        case Qt::Key_Space:
+            iniciarMovimientoPoderGoku();
+            break;
+        default:
+            QGraphicsItem::keyPressEvent(event);
+            break;
+        }
     }
 }
 
@@ -88,16 +133,16 @@ void Jugador::mostrarSpriteQuieto()
 
     switch(ultimaDireccion) {
     case 0:
-        movimientoSprite(2368);
+        movimientoSprite(2368, 0);
         break;
     case 1:
-        movimientoSprite(2240);
+        movimientoSprite(2240, 0);
         break;
     case 2:
-        movimientoSprite(2176);
+        movimientoSprite(2176, 0);
         break;
     case 3:
-        movimientoSprite(2304);
+        movimientoSprite(2304, 0);
         break;
     }
     //restaurar el conteo original y mantenerlo fijo
@@ -105,7 +150,7 @@ void Jugador::mostrarSpriteQuieto()
 
     //crear el sprite estatico (primer frame)
     sprite = hojaSprite.copy(0, posicionY, anchoSprite, altoSprite);
-    QPixmap spriteEscalado = sprite.scaled(22, 22);
+    QPixmap spriteEscalado = sprite.scaled(anchoSpriteEscalar, altoSpriteEscalar);
     setPixmap(spriteEscalado);
 }
 
@@ -186,52 +231,11 @@ void Jugador::lanzarPoderGoku()
 
 //***************** MOVIMIENTO NIVEL II *****************
 
-void Jugador::keyPressEventNivel2(QKeyEvent *event)
-{
-    if (!teclasPresionadas.contains(event->key())) {
-        teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
-    }
-
-    switch (event->key()) {
-    case Qt::Key_A:
-        movimiento(-5, 0);
-        movimientoSprite(2496, 8);
-        ultimaDireccion = 1;
-        break;
-    case Qt::Key_W:
-        movimiento(0, -5);
-        movimientoSprite(1856, 5);
-        ultimaDireccion = 2;
-        break;
-    case Qt::Key_S:
-        movimiento(0, 5);
-        movimientoSprite(2560, 8);
-        ultimaDireccion = 3;
-        break;
-    case Qt::Key_D:
-        movimiento(5, 0);
-        movimientoSprite(2624, 8);
-        ultimaDireccion = 0;
-        break;
-    case Qt::Key_Space:
-        if (validoCargarSuper) {
-            iniciarMovimientoPoderGoku();
-            validoCargarSuper = false;
-            emit poderLanzado();
-            break;
-        }
-        break;
-    default:
-        QGraphicsItem::keyPressEvent(event);
-        break;
-    }
-}
-
 void Jugador::movimientoNivel2(int dx, int dy)
 {
     //posicion actual antes de intentar el movimiento
-    qreal oldX = x;
-    qreal oldY = y;
+    //qreal oldX = x;
+    //qreal oldY = y;
 
     //intenta mover al jugador
     setPos(x + dx, y + dy);

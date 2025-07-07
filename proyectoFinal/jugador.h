@@ -9,8 +9,15 @@ class Jugador : public Personaje
     Q_OBJECT
 
 public:
-    Jugador(QPixmap _hojaSprite);
+    Jugador(QPixmap _hojaSprite,
+            unsigned short _x,
+            unsigned short _y,
+            unsigned short _anchoSprite,
+            unsigned short _altoSprite,
+            unsigned short _anchoSpriteEscalar,
+            unsigned short _altoSpriteEscalar);
     void setValidoCargarSuper(bool estado);
+    bool controlesNivel2Activos = true;
 
 private:
     unsigned short contadorspriteMovimientoPoderGoku;
