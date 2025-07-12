@@ -29,6 +29,12 @@ Personaje::Personaje(QPixmap _hojaSprite,
     setPixmap(spriteEscalado);
 }
 
+Personaje::~Personaje()
+{
+    qDebug() << "Destructor de Personaje";
+}
+
+
 unsigned short Personaje::getCargaVida() const {return cargaVida;}
 
 void Personaje::movimientoSprite(int direccion, unsigned short cantidadDeSprites)

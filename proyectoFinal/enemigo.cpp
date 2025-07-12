@@ -19,6 +19,17 @@ Enemigo::Enemigo(QPixmap _hojaSprite,
     timerMovimientoAtaque = new QTimer(this);
 }
 
+Enemigo::~Enemigo()
+{
+    if (timerMovimientoAtaque) {
+        timerMovimientoAtaque->stop();
+        delete timerMovimientoAtaque;
+        timerMovimientoAtaque = nullptr;
+    }
+
+    qDebug() << "Destructor de Enemigo";
+}
+
 void Enemigo::movimientoAtaque(){
     QList<QGraphicsItem *> itemsChocados = collidingItems(); //obtiene los elementos con los que colisiona
 

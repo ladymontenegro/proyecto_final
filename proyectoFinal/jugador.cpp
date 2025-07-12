@@ -46,6 +46,35 @@ Jugador::Jugador(QPixmap _hojaSprite,
     connect(timerGravedad, &QTimer::timeout, this, &Jugador::aplicarGravedad);
 }
 
+Jugador::~Jugador()
+{
+    if (timerMovimientoPoderGoku) {
+        timerMovimientoPoderGoku->stop();
+        delete timerMovimientoPoderGoku;
+        timerMovimientoPoderGoku = nullptr;
+    }
+
+    if (timerMovimientoSalto) {
+        timerMovimientoSalto->stop();
+        delete timerMovimientoSalto;
+        timerMovimientoSalto = nullptr;
+    }
+
+    if (timerMovimientoAgacho) {
+        timerMovimientoAgacho->stop();
+        delete timerMovimientoAgacho;
+        timerMovimientoAgacho = nullptr;
+    }
+
+    if (timerGravedad) {
+        timerGravedad->stop();
+        delete timerGravedad;
+        timerGravedad = nullptr;
+    }
+
+    qDebug() << "Destructor de Jugador";
+}
+
 unsigned short Jugador::getCargaSuper(){return cargaSuper;}
 
 void Jugador::setValidoCargarSuper(bool estado){validoCargarSuper = estado;}

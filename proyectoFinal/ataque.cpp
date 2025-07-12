@@ -21,11 +21,29 @@ Ataque::Ataque(QPixmap _spriteAtaque, QPointF inicioPosicion, unsigned short _di
     // Crear e iniciar el temporizador de movimiento
     timerMovimiento = new QTimer(this);
     connect(timerMovimiento, &QTimer::timeout, this, &Ataque::mover);
-    timerMovimiento->start(40); //
+    timerMovimiento->start(40);
+}
+
+Ataque::~Ataque()
+{
+    if (timerMovimiento) {
+        timerMovimiento->stop();
+        delete timerMovimiento;
+        timerMovimiento = nullptr;
+    }
+
+    qDebug() << "Destructor de Ataque";
 }
 
 void Ataque::mover()
 {
+    //por si no choco con nada y salio de escena
+    if (!scene() || !scene()->views().first()->rect().contains(pos().toPoint())) {
+        if (scene()) scene()->removeItem(this);
+        deleteLater();
+        return;
+    }
+
     // Mueve el poder en la direccion correcta
     qreal nuevoX = x() + (direccion == 0 ? velocidad : -velocidad);
     setPos(nuevoX, y());

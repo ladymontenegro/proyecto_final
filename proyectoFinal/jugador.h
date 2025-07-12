@@ -17,6 +17,8 @@ public:
             unsigned short _anchoSpriteEscalar,
             unsigned short _altoSpriteEscalar);
 
+    virtual ~Jugador() override;
+
     bool nivelDosActivo = true;
     void setValidoCargarSuper(bool estado);
     void setPuntoReinicio(qreal x, qreal y);

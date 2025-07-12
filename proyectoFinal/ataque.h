@@ -11,6 +11,7 @@ class Ataque : public QObject, public QGraphicsPixmapItem
     Q_OBJECT
 public:
     Ataque(QPixmap _spriteAtaque, QPointF inicioPosicion, unsigned short _direccion);
+    virtual ~Ataque();
 
 private slots:
     void mover();

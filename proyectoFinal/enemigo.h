@@ -14,6 +14,8 @@ public:
             unsigned short _anchoSpriteEscalar,
             unsigned short _altoSpriteEscalar);
 
+    virtual ~Enemigo() override;
+
     //void movimientoPredeterminado();
 
 private:

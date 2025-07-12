@@ -16,6 +16,8 @@ public:
               unsigned short _anchoSpriteEscalar,
               unsigned short _altoSpriteEscalar);
 
+    virtual ~Personaje();
+
     unsigned short getCargaVida() const;
     void movimientoSpriteYajirobe();
     bool verificarVictoriaNivel1();
@@ -29,7 +31,6 @@ protected:
     QPixmap sprite;
     QPixmap hojaBarraVida;
     QPixmap barraVida;
-    QTimer *tempMovimiento;
     unsigned short posicionX;
     unsigned short posicionY;
     unsigned int anchoSprite;
