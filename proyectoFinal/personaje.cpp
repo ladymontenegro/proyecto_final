@@ -29,6 +29,8 @@ Personaje::Personaje(QPixmap _hojaSprite,
     setPixmap(spriteEscalado);
 }
 
+int Personaje::getCargaVida() const {return cargaVida;}
+
 void Personaje::movimientoSprite(int direccion, unsigned short cantidadDeSprites)
 {
     posicionY = direccion;

@@ -9,6 +9,7 @@
 #include "QGraphicsPixmapItem"
 #include "bonificacion.h"
 #include "jugador.h"
+#include "enemigo.h"
 #include "obstaculo.h"
 #include "ui_mainwindow.h"
 
@@ -60,7 +61,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//METODOS PARA LA CARGA DEL NIVEL UNO
+//----------------- METODOS PARA LA CARGA DEL NIVEL UNO -----------------
 void MainWindow::nivel1()
 {
     //CONFIGURAR LA VENTANA
@@ -350,16 +351,17 @@ void MainWindow::resetCargaSuperYActualizarBarra() {
     actualizarBarraSuper();
 }
 
+//----------------- METODOS PARA LA CARGA DEL NIVEL DOS -----------------
 void MainWindow::nivel2(){
     //CONFIGURAR LA VISTA
     resize(1000, 600);
 
     QWidget *lifeBarContainer = new QWidget();
     lifeBarContainer->setFixedHeight(50); //le damos altura
-    lifeBarContainer->setStyleSheet("background-color: #6d2045;");
+    lifeBarContainer->setStyleSheet("background-color: transparent;");
 
     QHBoxLayout *lifeBarLayout = new QHBoxLayout(lifeBarContainer);
-    lifeBarLayout->setSpacing(350);
+    lifeBarLayout->setSpacing(450);
     lifeBarLayout->setContentsMargins(10, 5, 40, 5);
 
     QHBoxLayout *barraGokuLayout = new QHBoxLayout();
@@ -374,12 +376,12 @@ void MainWindow::nivel2(){
     QPixmap imagenRoshi(":multimedia/barraRoshi.png");
     for(int i = 0; i < 5; i++) {
         lifeBarRoshiLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarRoshiLabels[i]->setFixedSize(200, 40);
+        lifeBarRoshiLabels[i]->setFixedSize(250, 50);
 
         // Obtener el sprite correspondiente
         int y = i * 100;
         QPixmap sprite = imagenRoshi.copy(0, y, 500, 100);
-        QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QPixmap scaled = sprite.scaled(250, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         lifeBarRoshiLabels[i]->setPixmap(scaled);
         lifeBarRoshiLabels[i]->setVisible(false); //inicialmente ocultos
@@ -389,27 +391,30 @@ void MainWindow::nivel2(){
     QPixmap imagenGoku(":multimedia/barraGoku.png");
     for(int i = 0; i < 5; i++) {
         lifeBarGokuLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarGokuLabels[i]->setFixedSize(200, 40);
+        lifeBarGokuLabels[i]->setFixedSize(250, 50);
 
         // Obtener el sprite correspondiente
         int y = i * 100;
         QPixmap sprite = imagenGoku.copy(0, y, 500, 100);
-        QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QPixmap scaled = sprite.scaled(250, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         lifeBarGokuLabels[i]->setPixmap(scaled);
         lifeBarGokuLabels[i]->setVisible(false); //inicialmente ocultos
-        barraRoshiLayout->addWidget(lifeBarGokuLabels[i]);
+        barraGokuLayout->addWidget(lifeBarGokuLabels[i]);
     }
 
     lifeBarLayout->addStretch();
     lifeBarLayout->addLayout(barraGokuLayout);
-    lifeBarLayout->addLayout(barraGokuLayout);
+    lifeBarLayout->addLayout(barraRoshiLayout);
     lifeBarLayout->addStretch();
 
     QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
     proxyWidget->setWidget(lifeBarContainer);
-    //scene->addItem(proxyWidget);
-    //proxyWidget->setPos(2, 5);
+    scene->addItem(proxyWidget);
+    proxyWidget->setPos(0, 10);
+
+    actualizarBarraVidaGoku();
+    actualizarBarraVidaRoshi();
 
     QPixmap imagenCueva(":/multimedia/cueva.png");
     QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
@@ -418,7 +423,6 @@ void MainWindow::nivel2(){
     scene->setSceneRect(cueva->boundingRect());
     mainLayout->addWidget(view);
     crearPlataformas();
-    view->setFixedSize(1000, 600);
 
     //AGREGAR PERSONAJES
     //agregar a Goku
@@ -428,6 +432,8 @@ void MainWindow::nivel2(){
     goku->setFocus();
     goku->setPuntoReinicio(36, 336);
     goku->setPos(goku->x, goku->y);
+
+    connect(goku, &Jugador::vidaCambiada, this, &MainWindow::actualizarBarraVidaGoku);
 }
 
 void MainWindow::crearPlataformas(){
@@ -454,13 +460,13 @@ void MainWindow::actualizarBarraVidaGoku() {
         lifeBarGokuLabels[i]->setVisible(false);
     }
 
-    unsigned short cargaVida = 0;
+    unsigned short cargaVida = goku->getCargaVida();
     int estado = 0;
 
-    if(cargaVida >= 100) estado = 4;
-    else if(cargaVida >= 75) estado = 3;
-    else if(cargaVida >= 50) estado = 2;
-    else if(cargaVida >= 25) estado = 1;
+    if(cargaVida >= 4) estado = 4;
+    else if(cargaVida >= 3) estado = 3;
+    else if(cargaVida >= 2) estado = 2;
+    else if(cargaVida >= 1) estado = 1;
     else estado = 0;
 
     //mostrar solo el label correspondiente

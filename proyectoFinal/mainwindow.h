@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include "jugador.h"
+#include "enemigo.h"
 #include "bonificacion.h"
 
 QT_BEGIN_NAMESPACE
@@ -34,6 +35,7 @@ private:
     void nivel2();
     Ui::MainWindow *ui;
     Jugador *goku;
+    //Enemigo *roshi;;
     QGraphicsView *view;
     QGraphicsScene *scene;
     QWidget *centralWidget;
@@ -53,6 +55,5 @@ private:
     void crearMurosLaberinto();
     void crearPlataformas();
     void ubicarBonificaciones();
-    void mostrarBarraSuper(QPixmap &hojaSriteSuper);
 };
 #endif // MAINWINDOW_H

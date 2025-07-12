@@ -53,8 +53,6 @@ void Jugador::setPuntoReinicio(qreal x, qreal y) {
     puntoReinicioY = y;
 }
 
-int Jugador::getCargaVida() const {return cargaVida;}
-
 //----------------- MOVIMIENTO GENERAL -----------------
 
 

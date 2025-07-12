@@ -21,7 +21,6 @@ public:
     void setValidoCargarSuper(bool estado);
     void setPuntoReinicio(qreal x, qreal y);
     void perderVida();
-    int getCargaVida() const;
 
 private:
     //general
