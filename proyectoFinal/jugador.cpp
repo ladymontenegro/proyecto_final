@@ -46,7 +46,11 @@ Jugador::Jugador(QPixmap _hojaSprite,
     connect(timerGravedad, &QTimer::timeout, this, &Jugador::aplicarGravedad);
 }
 
+unsigned short Jugador::getCargaSuper(){return cargaSuper;}
+
 void Jugador::setValidoCargarSuper(bool estado){validoCargarSuper = estado;}
+
+void Jugador::setCargaSuper(unsigned short nuevaCarga){cargaSuper = nuevaCarga;}
 
 void Jugador::setPuntoReinicio(qreal x, qreal y) {
     puntoReinicioX = x;
@@ -199,6 +203,7 @@ void Jugador::movimiento(int dx, int dy)
         } else if (item->type() == QGraphicsPixmapItem::Type) {
             Bonificacion *bonificacion = dynamic_cast<Bonificacion *>(item);
             if (bonificacion) {
+                cargaSuper += 25;
                 emit bonificacionRecolectada(bonificacion);
             }
         }

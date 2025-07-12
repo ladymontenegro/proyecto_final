@@ -16,7 +16,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , cargaSuper(0)
+    , goku(nullptr)
+    , roshi(nullptr)
 {
     ui->setupUi(this);
 
@@ -116,10 +117,6 @@ void MainWindow::nivel1()
     superBarLayout->addWidget(titleLabel);
     superBarLayout->addStretch();
 
-
-    //inicializar barra
-    actualizarBarraSuper();
-
     //ELEMENTOS DE LA ESCENA
     //crear el laberinto
     QPixmap imagenLaberinto(":/multimedia/laberinto.png");
@@ -139,6 +136,9 @@ void MainWindow::nivel1()
     goku->setFocus();
     goku->setPos(goku->x, goku->y);
     scene->addItem(goku);
+
+    //inicializar barra
+    actualizarBarraSuper();
 
     //agregar a Yajirobe
     QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
@@ -307,9 +307,7 @@ void MainWindow::manejarBonificacionRecolectada(Bonificacion* bonificacion) {
 
     scene->removeItem(bonificacion);
 
-    cargaSuper += 25;
-
-    if(cargaSuper >= 100) {
+    if(goku->getCargaSuper() >= 100) {
         goku->setValidoCargarSuper(true);
     }
 
@@ -336,10 +334,10 @@ void MainWindow::actualizarBarraSuper() {
     }
 
     int estado = 0;
-    if(cargaSuper >= 100) estado = 4;
-    else if(cargaSuper >= 75) estado = 3;
-    else if(cargaSuper >= 50) estado = 2;
-    else if(cargaSuper >= 25) estado = 1;
+    if(goku->getCargaSuper() >= 100) estado = 4;
+    else if(goku->getCargaSuper() >= 75) estado = 3;
+    else if(goku->getCargaSuper() >= 50) estado = 2;
+    else if(goku->getCargaSuper() >= 25) estado = 1;
     else estado = 0;
 
     //mostrar solo el label correspondiente
@@ -347,7 +345,7 @@ void MainWindow::actualizarBarraSuper() {
 }
 
 void MainWindow::resetCargaSuperYActualizarBarra() {
-    cargaSuper = 0;
+    goku->setCargaSuper(0);
     actualizarBarraSuper();
 }
 
@@ -373,7 +371,7 @@ void MainWindow::nivel2(){
     barraRoshiLayout->setContentsMargins(0, 0, 0, 0);
 
 
-    QPixmap imagenRoshi(":multimedia/barraRoshi.png");
+    QPixmap imagenRoshi(":/multimedia/barraRoshi.png");
     for(int i = 0; i < 5; i++) {
         lifeBarRoshiLabels[i] = new QLabel(lifeBarContainer);
         lifeBarRoshiLabels[i]->setFixedSize(250, 50);
@@ -388,7 +386,7 @@ void MainWindow::nivel2(){
         barraRoshiLayout->addWidget(lifeBarRoshiLabels[i]);
     }
 
-    QPixmap imagenGoku(":multimedia/barraGoku.png");
+    QPixmap imagenGoku(":/multimedia/barraGoku.png");
     for(int i = 0; i < 5; i++) {
         lifeBarGokuLabels[i] = new QLabel(lifeBarContainer);
         lifeBarGokuLabels[i]->setFixedSize(250, 50);
@@ -413,9 +411,6 @@ void MainWindow::nivel2(){
     scene->addItem(proxyWidget);
     proxyWidget->setPos(0, 10);
 
-    actualizarBarraVidaGoku();
-    actualizarBarraVidaRoshi();
-
     QPixmap imagenCueva(":/multimedia/cueva.png");
     QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
     cueva->setZValue(-100);
@@ -434,6 +429,16 @@ void MainWindow::nivel2(){
     goku->setPos(goku->x, goku->y);
 
     connect(goku, &Jugador::vidaCambiada, this, &MainWindow::actualizarBarraVidaGoku);
+
+    //agregar a Roshi
+    QPixmap spriteRoshi(":/multimedia/roshi.png");
+    roshi = new Enemigo(spriteRoshi, 848, 248, 64, 64, 50, 50);
+    scene->addItem(roshi);
+    roshi->setPos(roshi->x, roshi->y);
+
+    //inicializar barras
+    actualizarBarraVidaGoku();
+    actualizarBarraVidaRoshi();
 }
 
 void MainWindow::crearPlataformas(){
@@ -460,13 +465,12 @@ void MainWindow::actualizarBarraVidaGoku() {
         lifeBarGokuLabels[i]->setVisible(false);
     }
 
-    unsigned short cargaVida = goku->getCargaVida();
     int estado = 0;
 
-    if(cargaVida >= 4) estado = 4;
-    else if(cargaVida >= 3) estado = 3;
-    else if(cargaVida >= 2) estado = 2;
-    else if(cargaVida >= 1) estado = 1;
+    if(goku->getCargaVida() >= 4) estado = 4;
+    else if(goku->getCargaVida() >= 3) estado = 3;
+    else if(goku->getCargaVida() >= 2) estado = 2;
+    else if(goku->getCargaVida() >= 1) estado = 1;
     else estado = 0;
 
     //mostrar solo el label correspondiente
@@ -479,13 +483,12 @@ void MainWindow::actualizarBarraVidaRoshi() {
         lifeBarRoshiLabels[i]->setVisible(false);
     }
 
-    unsigned short cargaVida = 0;
     int estado = 0;
 
-    if(cargaVida >= 100) estado = 4;
-    else if(cargaVida >= 75) estado = 3;
-    else if(cargaVida >= 50) estado = 2;
-    else if(cargaVida >= 25) estado = 1;
+    if(roshi->getCargaVida() >= 4) estado = 4;
+    else if(roshi->getCargaVida() >= 3) estado = 3;
+    else if(roshi->getCargaVida() >= 2) estado = 2;
+    else if(roshi->getCargaVida() >= 1) estado = 1;
     else estado = 0;
 
     //mostrar solo el label correspondiente

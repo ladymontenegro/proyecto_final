@@ -1,4 +1,5 @@
-/*#include "enemigo.h"
+#include "enemigo.h"
+#include "ataque.h"
 
 Enemigo::Enemigo(QPixmap _hojaSprite,
                  unsigned short _x,
@@ -14,4 +15,19 @@ Enemigo::Enemigo(QPixmap _hojaSprite,
                 _altoSprite,
                 _anchoSpriteEscalar,
                 _altoSpriteEscalar)
-{}*/
+{
+    timerMovimientoAtaque = new QTimer(this);
+}
+
+void Enemigo::movimientoAtaque(){
+    QList<QGraphicsItem *> itemsChocados = collidingItems(); //obtiene los elementos con los que colisiona
+
+    for (QGraphicsItem *item : itemsChocados) {
+        if (item->type() == QGraphicsPixmapItem::Type) {
+            Ataque *ataque = dynamic_cast<Ataque *>(item);
+            if(ataque){
+                emit golpeRecibido();
+            }
+        }
+    }
+}

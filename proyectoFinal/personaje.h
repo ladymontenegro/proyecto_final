@@ -16,7 +16,7 @@ public:
               unsigned short _anchoSpriteEscalar,
               unsigned short _altoSpriteEscalar);
 
-    int getCargaVida() const;
+    unsigned short getCargaVida() const;
     void movimientoSpriteYajirobe();
     bool verificarVictoriaNivel1();
 

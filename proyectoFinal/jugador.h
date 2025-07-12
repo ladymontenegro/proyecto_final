@@ -20,6 +20,8 @@ public:
     bool nivelDosActivo = true;
     void setValidoCargarSuper(bool estado);
     void setPuntoReinicio(qreal x, qreal y);
+    void setCargaSuper(unsigned short nuevaCarga);
+    unsigned short getCargaSuper();
     void perderVida();
 
 private:

@@ -1,4 +1,4 @@
-/*#ifndef ENEMIGO_H
+#ifndef ENEMIGO_H
 #define ENEMIGO_H
 #include "Personaje.h"
 
@@ -14,7 +14,7 @@ public:
             unsigned short _anchoSpriteEscalar,
             unsigned short _altoSpriteEscalar);
 
-    void movimientoPredeterminado();
+    //void movimientoPredeterminado();
 
 private:
     QTimer *timerMovimientoAtaque;
@@ -26,4 +26,4 @@ signals:
     void golpeRecibido();
 };
 
-#endif // ENEMIGO_H*/
+#endif // ENEMIGO_H

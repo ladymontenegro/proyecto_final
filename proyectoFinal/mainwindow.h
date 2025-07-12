@@ -35,7 +35,7 @@ private:
     void nivel2();
     Ui::MainWindow *ui;
     Jugador *goku;
-    //Enemigo *roshi;;
+    Enemigo *roshi;
     QGraphicsView *view;
     QGraphicsScene *scene;
     QWidget *centralWidget;
@@ -46,7 +46,6 @@ private:
     QLabel *superBarLabels[5];
     QLabel *lifeBarGokuLabels[5];
     QLabel *lifeBarRoshiLabels[5];
-    int cargaSuper;
 
     void actualizarBarraSuper();
     void actualizarBarraVidaRoshi();
