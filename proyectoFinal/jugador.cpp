@@ -20,24 +20,47 @@ Jugador::Jugador(QPixmap _hojaSprite,
                 _anchoSpriteEscalar,
                 _altoSpriteEscalar)
     , cargaSuper(0)
+    , enPlataforma(false)
+    , validoCargarSuper(false)
+    , nivelDosActivo(true)
+    , puntoReinicioX(0)
+    , puntoReinicioY(0)
 {
-    validoCargarSuper = false;
+    //validoCargarSuper = false;
     setFlag(QGraphicsItem::ItemIsFocusable);
     hojaMovimientoPoderGoku.load(":/multimedia/movimientoPoderGoku.png");
+
     timerMovimientoPoderGoku = new QTimer(this);
     connect(timerMovimientoPoderGoku, &QTimer::timeout, this, &Jugador::movimientoPoderGoku);
     timerMovimientoPoderGoku->setInterval(100);
+
+    timerMovimientoSalto = new QTimer(this);
+    connect(timerMovimientoSalto, &QTimer::timeout, this, &Jugador::movimientoSalto);
+    timerMovimientoSalto->setInterval(30);
+
+    timerMovimientoAgacho = new QTimer(this);
+    connect(timerMovimientoAgacho, &QTimer::timeout, this, &Jugador::movimientoAgacho);
+    timerMovimientoAgacho->setInterval(100);
+
+    timerGravedad = new QTimer(this);
+    connect(timerGravedad, &QTimer::timeout, this, &Jugador::aplicarGravedad);
 }
 
-void Jugador::setValidoCargarSuper(bool estado){
-    validoCargarSuper = estado;
+void Jugador::setValidoCargarSuper(bool estado){validoCargarSuper = estado;}
+
+void Jugador::setPuntoReinicio(qreal x, qreal y) {
+    puntoReinicioX = x;
+    puntoReinicioY = y;
 }
 
-//***************** MOVIMIENTO *****************
+int Jugador::getCargaVida() const {return cargaVida;}
+
+//----------------- MOVIMIENTO GENERAL -----------------
+
 
 void Jugador::keyPressEvent(QKeyEvent *event)
 {
-    if (!controlesNivel2Activos) {
+    if (!nivelDosActivo) {
         if (!teclasPresionadas.contains(event->key())) {
             teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
         }
@@ -75,29 +98,27 @@ void Jugador::keyPressEvent(QKeyEvent *event)
             QGraphicsItem::keyPressEvent(event);
             break;
         }
-    } else if (controlesNivel2Activos) {
+    } else if (nivelDosActivo) {
         if (!teclasPresionadas.contains(event->key())) {
             teclasPresionadas.append(event->key()); //para que guarde la tecla, si no esta repetida
         }
 
         switch (event->key()) {
         case Qt::Key_A:
-            movimientoNivel2(-5, 0);
+            movimientoNivelDos(-5, 0);
             movimientoSprite(2496, 8);
             ultimaDireccion = 1;
             break;
         case Qt::Key_W:
-            movimientoNivel2(0, -5);
-            movimientoSprite(1856, 5);
-            ultimaDireccion = 2;
+            if (enPlataforma) {
+                iniciarMovimientoSalto();
+            }
             break;
         case Qt::Key_S:
-            movimientoNivel2(0, 5);
-            movimientoSprite(2560, 8);
-            ultimaDireccion = 3;
+            iniciarMovimientoAgacho();
             break;
         case Qt::Key_D:
-            movimientoNivel2(5, 0);
+            movimientoNivelDos(5, 0);
             movimientoSprite(2624, 8);
             ultimaDireccion = 0;
             break;
@@ -154,6 +175,7 @@ void Jugador::mostrarSpriteQuieto()
     setPixmap(spriteEscalado);
 }
 
+
 void Jugador::movimiento(int dx, int dy)
 {
     //posicion actual antes de intentar el movimiento
@@ -185,7 +207,7 @@ void Jugador::movimiento(int dx, int dy)
     }
 }
 
-//***************** PODER *****************
+//----------------- ANIMACIONES DE MOVIMIENTO -----------------
 
 void Jugador::iniciarMovimientoPoderGoku()
 {
@@ -202,7 +224,13 @@ void Jugador::movimientoPoderGoku()
         anchoSpriteMovimientoPoderGoku = 66; // Ancho por defecto
         posicionXPoderGoku = contadorspriteMovimientoPoderGoku * anchoSpriteMovimientoPoderGoku;
         spriteMovimientoPoderGoku = hojaMovimientoPoderGoku.copy(posicionXPoderGoku, 0, anchoSpriteMovimientoPoderGoku, 128);
-        QPixmap spriteEscalado = spriteMovimientoPoderGoku.scaled(22, 32);
+
+        QPixmap spriteEscalado;
+        if(nivelDosActivo){
+            spriteEscalado = spriteMovimientoPoderGoku.scaled(50, 72);
+        } else {
+            spriteEscalado = spriteMovimientoPoderGoku.scaled(22, 32);
+        }
 
         //espejar el sprite
         if (ultimaDireccion == 1) {
@@ -223,51 +251,214 @@ void Jugador::lanzarPoderGoku()
 {
     QPointF inicio = {ultimaDireccion != 1 ? x + 20 : x - 20, y + 4};
     QPixmap sprite(":/multimedia/poderGoku.png");
-    QPixmap spriteEscalado = sprite.scaled(30, 20);
+
+    QPixmap spriteEscalado;
+    if(nivelDosActivo){
+        spriteEscalado = sprite.scaled(40, 30);
+    } else {
+        spriteEscalado = sprite.scaled(30, 20);
+    }
 
     Ataque *ataqueGoku = new Ataque(spriteEscalado, inicio, ultimaDireccion);
     scene()->addItem(ataqueGoku);
 }
 
-//***************** MOVIMIENTO NIVEL II *****************
+void Jugador::iniciarMovimientoSalto(){
+    if (!enPlataforma) return;
 
-void Jugador::movimientoNivel2(int dx, int dy)
-{
-    //posicion actual antes de intentar el movimiento
-    //qreal oldX = x;
-    //qreal oldY = y;
+    contadorspriteMovimientoSalto = 0;
 
-    //intenta mover al jugador
-    setPos(x + dx, y + dy);
+    velocidadVertical = -15;  //valor negativo para subirs
+    movimientoAgacho();
 
-    //actualiza la nueva posicion
-    x = pos().x();
-    y = pos().y();
+    timerMovimientoSalto->start();
+}
 
-    // Obtener rectangulo del jugador en coordenadas de escena
-    QRectF gokuRect = boundingRect().translated(pos());
+void Jugador::movimientoSalto(){
+    //actualizar poicion
+    movimientoNivelDos(0, velocidadVertical);
 
-    //bool sobrePlataforma = false;
+    //reducir impulso vertical (gravedad)
+    velocidadVertical += 1.0;  //gravedad suave
 
-    for (QGraphicsItem *item : collidingItems()) {
+    QPixmap spriteEscalado;
+
+    if (contadorspriteMovimientoSalto <= 4) {
+        posicionSaltoX = 0;
+        posicionSaltoX = contadorspriteMovimientoSalto * anchoSprite;
+        QPixmap spriteMovimientoSalto = hojaSprite.copy(posicionSaltoX, 1856, anchoSprite, altoSprite);
+        //posicionX, posicionY, anchoSprite, altoSprite
+        spriteEscalado = spriteMovimientoSalto.scaled(50, 50);
+
+        //espejar el sprite
+        if (ultimaDireccion == 1) {
+            spriteEscalado = spriteEscalado.transformed(QTransform().scale(-1, 1));
+        }
+
+        setPixmap(spriteEscalado);
+        contadorspriteMovimientoSalto++;
+
+    } else if (enPlataforma){
+        timerMovimientoSalto->stop();
+        mostrarSpriteQuieto();
+    }
+    else {
+        //para que cuando caiga quede un sprite especifico
+        QPixmap spriteCaida = hojaSprite.copy(256, 1856, anchoSprite, altoSprite);
+        spriteEscalado = spriteCaida.scaled(50, 50);
+        //espejar el sprite
+        if (ultimaDireccion == 1) {
+            spriteEscalado = spriteEscalado.transformed(QTransform().scale(-1, 1));
+        }
+        setPixmap(spriteEscalado);
+    }
+}
+
+void Jugador::iniciarMovimientoAgacho(){
+    contadorspriteMovimientoAgacho = 0;
+    movimientoAgacho();
+    timerMovimientoAgacho->start();
+}
+
+void Jugador::movimientoAgacho(){
+    if (contadorspriteMovimientoAgacho <= 3) {
+        posicionAgachoX = 0;
+        posicionAgachoX = contadorspriteMovimientoAgacho * anchoSprite;
+        QPixmap spriteMovimientoAgacho = hojaSprite.copy(posicionAgachoX, 1280, anchoSprite, altoSprite);
+        //posicionX, posicionY, anchoSprite, altoSprite
+        QPixmap spriteEscalado = spriteMovimientoAgacho.scaled(50, 50);
+
+        //espejar el sprite
+        if (ultimaDireccion == 1) {
+            spriteEscalado = spriteEscalado.transformed(QTransform().scale(-1, 1));
+        }
+
+        setPixmap(spriteEscalado);
+        contadorspriteMovimientoAgacho++;
+
+    } else {
+        timerMovimientoAgacho->stop();
+    }
+}
+
+
+//----------------- MOVIMIENTO NIVEL II -----------------
+
+void Jugador::movimientoNivelDos(int dx, int dy) {
+
+    timerGravedad->start(16);
+
+    //definir limites de la ventana
+    const qreal limiteIzquierdo = 0;
+    const qreal limiteDerecho = 1000;
+    const qreal limiteSuperior = 0;
+    const qreal limiteInferior = 600;
+
+    qreal newX = x;
+    qreal newY = y;
+
+    if (dx != 0) newX = x + dx;
+    if (dy != 0) newY = y + dy;
+
+    QRectF bordeJugador = boundingRect();
+    QRectF jugadorRect = QRectF(
+        newX + bordeJugador.left(),
+        newY + bordeJugador.top(),
+        bordeJugador.width(),
+        bordeJugador.height()
+        );
+
+    //verificar colision con los limites
+    if (jugadorRect.left() < limiteIzquierdo) {
+        newX = limiteIzquierdo - bordeJugador.left();
+    }
+    else if (jugadorRect.right() > limiteDerecho) {
+        newX = limiteDerecho - bordeJugador.right();
+    }
+
+    if (jugadorRect.top() < limiteSuperior) {
+        newY = limiteSuperior - bordeJugador.top();
+    }
+    else if (jugadorRect.bottom() > limiteInferior) {
+        perderVida();
+        return;
+    }
+
+    if (dx != 0 || dy != 0) {
+        setPos(newX, newY);
+        x = newX;
+        y = newY;
+    }
+
+    //actualizar estado de plataforma
+    actualizarEnPlataforma();
+}
+
+void Jugador::actualizarEnPlataforma() {
+    enPlataforma = false;
+
+    //area de los pies
+    QRectF pieRect(
+        boundingRect().left() + 5,
+        boundingRect().bottom() - 1,
+        boundingRect().width() - 10,
+        1
+        );
+    pieRect.translate(pos());
+
+    for (QGraphicsItem* item : collidingItems()) {
         if (item->type() == QGraphicsRectItem::Type) {
             QRectF plataformaRect = item->boundingRect().translated(item->pos());
 
-            // Validacion colision desde arriba
-            bool colisionDesdeArriba = gokuRect.bottom() > plataformaRect.top()
-                                       && gokuRect.bottom() < plataformaRect.top() + 10
-                                       && // tolerancia
-                                       gokuRect.right() > plataformaRect.left()
-                                       && gokuRect.left() < plataformaRect.right()
-                                       && dy > 0; // Si esta cayendo
+            if (pieRect.intersects(plataformaRect)) {
+                if ((velocidadVertical >= 0 || enPlataforma) &&
+                    pieRect.bottom() >= plataformaRect.top() &&
+                    pieRect.bottom() <= plataformaRect.top() + 10) {
 
-            if (colisionDesdeArriba) {
-                // Aterriza sobre la plataforma
-                setPos(x, plataformaRect.top() - altoSprite);
-                dy = 0;
-                //sobrePlataforma = true;
-                break;
+                    enPlataforma = true;
+
+                    //ajuste de posicion
+                    qreal nuevaY = plataformaRect.top() - boundingRect().height();
+                    setPos(x, nuevaY);
+                    break;
+                }
             }
         }
+    }
+
+    if (enPlataforma) {
+        if (timerMovimientoSalto->isActive() && velocidadVertical > 0) {
+            timerMovimientoSalto->stop();
+            mostrarSpriteQuieto();
+        }
+        velocidadVertical = 0;
+    } else {
+        //solo si no esta en plataforma
+        if (!timerMovimientoSalto->isActive()) {
+            velocidadVertical += 1.0;
+        }
+    }
+}
+
+void Jugador::aplicarGravedad() {
+    //solo aplicar si no esta saltando activamente
+    if (!timerMovimientoSalto->isActive() && !enPlataforma) {
+        movimientoNivelDos(0, 5);  //gravedad normal
+    }
+}
+
+void Jugador::perderVida() {
+    cargaVida--;
+    emit vidaCambiada(cargaVida);
+
+    if(cargaVida > 0) {
+        setPos(puntoReinicioX, puntoReinicioY);
+        x = pos().x();
+        y = pos().y();
+        velocidadVertical = 0;
+        enPlataforma = true;
+
+    } else {
+        emit jugadorMurio();
     }
 }

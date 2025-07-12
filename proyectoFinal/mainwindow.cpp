@@ -134,10 +134,10 @@ void MainWindow::nivel1()
     //agregar a Goku
     QPixmap spriteGoku(":/multimedia/goku.png");
     goku = new Jugador(spriteGoku, 267, 271, 64, 64, 22, 22);
-    goku->controlesNivel2Activos = false;
-    scene->addItem(goku);
+    goku->nivelDosActivo = false;
     goku->setFocus();
     goku->setPos(goku->x, goku->y);
+    scene->addItem(goku);
 
     //agregar a Yajirobe
     QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
@@ -354,7 +354,6 @@ void MainWindow::nivel2(){
     //CONFIGURAR LA VISTA
     resize(1000, 600);
 
-    /*
     QWidget *lifeBarContainer = new QWidget();
     lifeBarContainer->setFixedHeight(50); //le damos altura
     lifeBarContainer->setStyleSheet("background-color: #6d2045;");
@@ -375,7 +374,7 @@ void MainWindow::nivel2(){
     QPixmap imagenRoshi(":multimedia/barraRoshi.png");
     for(int i = 0; i < 5; i++) {
         lifeBarRoshiLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarRoshiLabels[i]->setFixedSize(200, 40); // Tamaño fijo
+        lifeBarRoshiLabels[i]->setFixedSize(200, 40);
 
         // Obtener el sprite correspondiente
         int y = i * 100;
@@ -383,14 +382,14 @@ void MainWindow::nivel2(){
         QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         lifeBarRoshiLabels[i]->setPixmap(scaled);
-        lifeBarRoshiLabels[i]->setVisible(false); // Inicialmente ocultos
+        lifeBarRoshiLabels[i]->setVisible(false); //inicialmente ocultos
         barraRoshiLayout->addWidget(lifeBarRoshiLabels[i]);
     }
 
     QPixmap imagenGoku(":multimedia/barraGoku.png");
     for(int i = 0; i < 5; i++) {
         lifeBarGokuLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarGokuLabels[i]->setFixedSize(200, 40); // Tamaño fijo
+        lifeBarGokuLabels[i]->setFixedSize(200, 40);
 
         // Obtener el sprite correspondiente
         int y = i * 100;
@@ -398,19 +397,19 @@ void MainWindow::nivel2(){
         QPixmap scaled = sprite.scaled(200, 40, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         lifeBarGokuLabels[i]->setPixmap(scaled);
-        lifeBarGokuLabels[i]->setVisible(false); // Inicialmente ocultos
+        lifeBarGokuLabels[i]->setVisible(false); //inicialmente ocultos
         barraRoshiLayout->addWidget(lifeBarGokuLabels[i]);
     }
 
     lifeBarLayout->addStretch();
-    lifeBarLayout->addWidget(lifeBarGokuLabels);
-    lifeBarLayout->addWidget(lifeBarRoshiLabels);
+    lifeBarLayout->addLayout(barraGokuLayout);
+    lifeBarLayout->addLayout(barraGokuLayout);
     lifeBarLayout->addStretch();
 
     QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
     proxyWidget->setWidget(lifeBarContainer);
-    scene->addItem(proxyWidget);
-    proxyWidget->setPos(100, 100);*/
+    //scene->addItem(proxyWidget);
+    //proxyWidget->setPos(2, 5);
 
     QPixmap imagenCueva(":/multimedia/cueva.png");
     QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
@@ -424,27 +423,69 @@ void MainWindow::nivel2(){
     //AGREGAR PERSONAJES
     //agregar a Goku
     QPixmap spriteGoku(":/multimedia/goku.png");
-    goku = new Jugador(spriteGoku, 267, 240, 64, 64, 50, 50);
+    goku = new Jugador(spriteGoku, 36, 248, 64, 64, 50, 50);
     scene->addItem(goku);
-    goku->controlesNivel2Activos = true;
     goku->setFocus();
+    goku->setPuntoReinicio(36, 336);
     goku->setPos(goku->x, goku->y);
 }
 
 void MainWindow::crearPlataformas(){
     QVector<QRectF> posicionesPlataformas = {
     {0, 296, 312, 32}, {0, 384, 236, 32}, {0, 468, 400, 32},
-    {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}};
+    {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}
+    };
 
     for(auto &datosPlataforma : posicionesPlataformas){
         QGraphicsRectItem *plataforma = new QGraphicsRectItem(datosPlataforma);
-        plataforma->setBrush(QColor("#6d2045"));
-        plataforma->setPen(QColor("#FFFFFF"));
-        plataforma->setFlag(QGraphicsItem::ItemIsMovable);
-        plataforma->setOpacity(0.5);
+        plataforma->setBrush(Qt::NoBrush);
+        plataforma->setPen(Qt::NoPen);
+        //plataforma->setBrush(QColor("#6d2045"));
+        //plataforma->setPen(QColor("#FFFFFF"));
+        //plataforma->setFlag(QGraphicsItem::ItemIsMovable);
+        //plataforma->setOpacity(0.5);
         scene->addItem(plataforma);
     }
 }
+
+void MainWindow::actualizarBarraVidaGoku() {
+    //ocultar todos los labels primero
+    for(int i = 0; i < 5; i++) {
+        lifeBarGokuLabels[i]->setVisible(false);
+    }
+
+    unsigned short cargaVida = 0;
+    int estado = 0;
+
+    if(cargaVida >= 100) estado = 4;
+    else if(cargaVida >= 75) estado = 3;
+    else if(cargaVida >= 50) estado = 2;
+    else if(cargaVida >= 25) estado = 1;
+    else estado = 0;
+
+    //mostrar solo el label correspondiente
+    lifeBarGokuLabels[estado]->setVisible(true);
+}
+
+void MainWindow::actualizarBarraVidaRoshi() {
+    //ocultar todos los labels primero
+    for(int i = 0; i < 5; i++) {
+        lifeBarRoshiLabels[i]->setVisible(false);
+    }
+
+    unsigned short cargaVida = 0;
+    int estado = 0;
+
+    if(cargaVida >= 100) estado = 4;
+    else if(cargaVida >= 75) estado = 3;
+    else if(cargaVida >= 50) estado = 2;
+    else if(cargaVida >= 25) estado = 1;
+    else estado = 0;
+
+    //mostrar solo el label correspondiente
+    lifeBarRoshiLabels[estado]->setVisible(true);
+}
+
 
 
 

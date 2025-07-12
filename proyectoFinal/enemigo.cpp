@@ -1,4 +1,4 @@
-#include "enemigo.h"
+/*#include "enemigo.h"
 
 Enemigo::Enemigo(QPixmap _hojaSprite,
                  unsigned short _x,
@@ -14,4 +14,4 @@ Enemigo::Enemigo(QPixmap _hojaSprite,
                 _altoSprite,
                 _anchoSpriteEscalar,
                 _altoSpriteEscalar)
-{}
+{}*/

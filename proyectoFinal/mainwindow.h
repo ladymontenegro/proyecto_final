@@ -47,6 +47,8 @@ private:
     int cargaSuper;
 
     void actualizarBarraSuper();
+    void actualizarBarraVidaRoshi();
+    void actualizarBarraVidaGoku();
     void crearBloquesCuadrado();
     void crearMurosLaberinto();
     void crearPlataformas();
