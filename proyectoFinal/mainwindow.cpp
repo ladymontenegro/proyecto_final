@@ -435,6 +435,8 @@ void MainWindow::nivel2(){
     roshi = new Enemigo(spriteRoshi, 848, 248, 64, 64, 50, 50);
     scene->addItem(roshi);
     roshi->setPos(roshi->x, roshi->y);
+    roshi->setPlataformas(plataformasDerecha);
+    roshi->setJugadorObjetivo(goku);
 
     //inicializar barras
     actualizarBarraVidaGoku();
@@ -443,8 +445,8 @@ void MainWindow::nivel2(){
 
 void MainWindow::crearPlataformas(){
     QVector<QRectF> posicionesPlataformas = {
-    {0, 296, 312, 32}, {0, 384, 236, 32}, {0, 468, 400, 32},
-    {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}
+        {0, 296, 312, 32}, {0, 384, 236, 32}, {0, 468, 400, 32},
+        {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}
     };
 
     for(auto &datosPlataforma : posicionesPlataformas){
@@ -456,6 +458,9 @@ void MainWindow::crearPlataformas(){
         //plataforma->setFlag(QGraphicsItem::ItemIsMovable);
         //plataforma->setOpacity(0.5);
         scene->addItem(plataforma);
+        if (plataforma && plataforma->rect().x() > 495) {
+            plataformasDerecha.append(plataforma->rect());
+        }
     }
 }
 
@@ -494,23 +499,3 @@ void MainWindow::actualizarBarraVidaRoshi() {
     //mostrar solo el label correspondiente
     lifeBarRoshiLabels[estado]->setVisible(true);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,6 +7,7 @@
 class Personaje : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
+
 public:
     Personaje(QPixmap _hojaSprite,
               unsigned short _x,
@@ -41,6 +42,9 @@ protected:
     unsigned int cargaVida;
 
     void movimientoSprite(int direccion, unsigned short cantidadDeSprites);
+
+signals:
+    void vidaCambiada(int nuevaCarga);
 };
 
 #endif // PERSONAJE_H

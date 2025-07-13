@@ -455,6 +455,12 @@ void Jugador::actualizarEnPlataforma() {
                     break;
                 }
             }
+        } else if (item->type() == QGraphicsPixmapItem::Type) {
+            Ataque *ataque = dynamic_cast<Ataque *>(item);
+            if (ataque) {
+                cargaVida --;
+                emit vidaCambiada(cargaVida);
+            }
         }
     }
 
