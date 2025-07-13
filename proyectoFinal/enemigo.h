@@ -13,10 +13,16 @@ public:
             unsigned short _altoSprite,
             unsigned short _anchoSpriteEscalar,
             unsigned short _altoSpriteEscalar);
+
     void movimientoPredeterminado();
 
 private:
-    QTimer *tempAtaque;
+    QTimer *timerMovimientoPoderRochi;
+    unsigned short contadorspriteMovimientoPoderRochi;
+
+    void iniciarMovimientoPoderRochi();
+    void movimientoPoderRochi();
+    void lanzarPoderRochi();
 };
 
 #endif // ENEMIGO_H
