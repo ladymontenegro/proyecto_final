@@ -1,4 +1,6 @@
 #include "enemigo.h"
+#include "ataque.h"
+#include <QGraphicsScene>
 
 Enemigo::Enemigo(QPixmap _hojaSprite,
                  unsigned short _x,
@@ -14,48 +16,147 @@ Enemigo::Enemigo(QPixmap _hojaSprite,
                 _altoSprite,
                 _anchoSpriteEscalar,
                 _altoSpriteEscalar)
-{}
-
-void Enemigo::iniciarMovimientoPoderRochi()
+    , timerMovimiento(nullptr)
 {
-    contadorspriteMovimientoPoderRochi = 0; // Reinicia la animacion al inicio
-    movimientoPoderRochi();                 // Muestra el primer frame inmediatamente
-    timerMovimientoPoderRochi->start();     // Inicia el timer para el resto de la animacion
+    timerDisparo = new QTimer(this);
+    connect(timerDisparo, &QTimer::timeout, this, &Enemigo::disparar);
+    timerDisparo->start(800); // cada 3s dispara
+
+    timerMovimientoGolpe = new QTimer(this);
+    connect(timerMovimientoGolpe, &QTimer::timeout, this, &Enemigo::movimientoGolpe);
+    timerMovimientoGolpe->setInterval(100);
+
 }
 
-void Enemigo::movimientoPoderRochi()
+Enemigo::~Enemigo()
 {
-    if (contadorspriteMovimientoPoderRochi <= 6) {
-        posicionXPoderRochi = 0;
-        anchoSpriteMovimientoPoderRochi = 66; // Ancho por defecto
-        posicionXPoderRochi = contadorspriteMovimientoPoderRochi * anchoSpriteMovimientoPoderRochi;
-        spriteMovimientoPoderRochi = hojaMovimientoPoderRochi.copy(posicionXPoderRochi,
-                                                                   0,
-                                                                   anchoSpriteMovimientoPoderRochi,
-                                                                   128);
-        QPixmap spriteEscalado = spriteMovimientoPoderRochi.scaled(22, 32);
+    if (timerMovimiento) {
+        timerMovimiento->stop();
+        delete timerMovimiento;
+        timerMovimiento = nullptr;
+    }
 
-        //espejar el sprite
-        if (ultimaDireccion == 1) {
-            spriteEscalado = spriteEscalado.transformed(QTransform().scale(-1, 1));
+    if (timerMovimientoGolpe) {
+        timerMovimientoGolpe->stop();
+        delete timerMovimientoGolpe;
+        timerMovimientoGolpe = nullptr;
+    }
+
+    if (timerDisparo) {
+        timerDisparo->stop();
+        delete timerDisparo;
+        timerDisparo = nullptr;
+    }
+
+    if (timerSalto) {
+        timerSalto->stop();
+        delete timerSalto;
+        timerSalto = nullptr;
+    }
+
+    qDebug() << "Destructor de Enemigo";
+}
+
+void Enemigo::setJugadorObjetivo(Jugador *jugador) {
+    jugadorObjetivo = jugador;
+}
+
+void Enemigo::setPlataformas(const QVector<QRectF> &listaPlataformas) {
+    plataformas = listaPlataformas;
+    if (!plataformas.isEmpty()) {
+        setPos(plataformas[0].x() + 20, plataformas[0].y() - pixmap().height());
+        plataformaActual = 0;
+
+        puedeSaltarEntrePlataformas = true;
+
+        if (!timerMovimiento) {
+            timerMovimiento = new QTimer(this);
+            connect(timerMovimiento, &QTimer::timeout, this, &Enemigo::moverEntrePlataformas);
         }
-
-        setPixmap(spriteEscalado);
-        contadorspriteMovimientoPoderRochi++;
-
-    } else {
-        timerMovimientoPoderRochi->stop();
-        lanzarPoderRochi();
-        mostrarSpriteQuieto();
+        timerMovimiento->start(1000);
     }
 }
 
-void Enemigo::lanzarPoderRochi()
-{
-    QPointF inicio = {ultimaDireccion != 1 ? x + 20 : x - 20, y + 4};
-    QPixmap sprite(":/multimedia/poderRochi.png");
-    QPixmap spriteEscalado = sprite.scaled(30, 20);
+void Enemigo::moverEntrePlataformas() {
+    if (plataformas.isEmpty() || !puedeSaltarEntrePlataformas) return;
 
-    Ataque *ataqueRochi = new Ataque(spriteEscalado, inicio, ultimaDireccion);
-    scene()->addItem(ataqueRochi);
+    plataformaActual = (plataformaActual + 1) % plataformas.size();
+    destinoSalto = QPointF(plataformas[plataformaActual].x() + 20,
+                           plataformas[plataformaActual].y() - pixmap().height());
+    origenSalto = pos();
+    tiempoSalto = 0;
+
+    if (!timerSalto) {
+        timerSalto = new QTimer(this);
+        connect(timerSalto, &QTimer::timeout, this, &Enemigo::animarSalto);
+    }
+
+    timerSalto->start(40);
+}
+
+void Enemigo::disparar() {
+    if (piedraActiva || !jugadorObjetivo) return;
+
+    piedraActiva = true;
+    puedeSaltarEntrePlataformas = false;
+
+    iniciarMovimientoGolpe();
+
+    QPointF posicionJugador = jugadorObjetivo->sceneBoundingRect().center();
+    QPointF posicionEnemigo = pos();
+    unsigned short direccion = (posicionJugador.x() < posicionEnemigo.x()) ? 1 : 0;
+
+    Ataque *piedra = new Ataque(QPixmap(":/multimedia/piedra.png"), posicionEnemigo, posicionJugador, direccion);
+    piedra->usarMovimientoParabolico();
+
+    connect(piedra, &Ataque::destruido, this, [this]() {
+        piedraActiva = false;
+        puedeSaltarEntrePlataformas = true;
+    });
+
+    if (scene()) scene()->addItem(piedra);
+}
+
+void Enemigo::iniciarMovimientoGolpe(){
+    contadorspriteMovimientoGolpe = 0;
+    movimientoGolpe();
+    timerMovimientoGolpe->start();
+}
+
+void Enemigo::movimientoGolpe(){
+    if (contadorspriteMovimientoGolpe <= 5) {
+        posicionGolpeX = 0;
+        posicionGolpeX = contadorspriteMovimientoGolpe * anchoSprite;
+        QPixmap spriteMovimientoAgacho = hojaSprite.copy(posicionGolpeX, 3264, anchoSprite, altoSprite);
+        //posicionX, posicionY, anchoSprite, altoSprite
+        QPixmap spriteEscalado = spriteMovimientoAgacho.scaled(50, 50);
+
+        setPixmap(spriteEscalado);
+        contadorspriteMovimientoGolpe++;
+
+    } else {
+        timerMovimientoGolpe->stop();
+    }
+}
+
+void Enemigo::animarSalto() {
+    const float duracionTotal = 20; //para velocidad
+
+    tiempoSalto++;
+
+    float t = tiempoSalto / duracionTotal;
+    if (t > 1.0f) {
+        setPos(destinoSalto);
+        timerSalto->stop();
+        return;
+    }
+
+    float nuevoX = origenSalto.x() + t * (destinoSalto.x() - origenSalto.x());
+    float altura = -50 * sin(M_PI * t); //pico en la mitad
+
+    float nuevoY = origenSalto.y() + t * (destinoSalto.y() - origenSalto.y()) + altura;
+
+    setPos(nuevoX, nuevoY);
+
+    movimientoSprite(1728, 5);
 }

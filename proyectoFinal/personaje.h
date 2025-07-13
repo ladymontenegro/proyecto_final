@@ -7,6 +7,7 @@
 class Personaje : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
+
 public:
     Personaje(QPixmap _hojaSprite,
               unsigned short _x,
@@ -16,6 +17,9 @@ public:
               unsigned short _anchoSpriteEscalar,
               unsigned short _altoSpriteEscalar);
 
+    virtual ~Personaje();
+
+    unsigned short getCargaVida() const;
     void movimientoSpriteYajirobe();
     bool verificarVictoriaNivel1();
 
@@ -28,7 +32,6 @@ protected:
     QPixmap sprite;
     QPixmap hojaBarraVida;
     QPixmap barraVida;
-    QTimer *tempMovimiento;
     unsigned short posicionX;
     unsigned short posicionY;
     unsigned int anchoSprite;
@@ -39,6 +42,9 @@ protected:
     unsigned int cargaVida;
 
     void movimientoSprite(int direccion, unsigned short cantidadDeSprites);
+
+signals:
+    void vidaCambiada(int nuevaCarga);
 };
 
 #endif // PERSONAJE_H

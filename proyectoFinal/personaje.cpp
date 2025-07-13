@@ -22,11 +22,20 @@ Personaje::Personaje(QPixmap _hojaSprite,
     , anchoSpriteEscalar(_anchoSpriteEscalar)
     , altoSpriteEscalar(_altoSpriteEscalar)
     , conteoSprite(0)
+    , cargaVida(4)
 {
     sprite = hojaSprite.copy(posicionX, posicionY, anchoSprite, altoSprite);
     QPixmap spriteEscalado = sprite.scaled(anchoSpriteEscalar, altoSpriteEscalar);
     setPixmap(spriteEscalado);
 }
+
+Personaje::~Personaje()
+{
+    qDebug() << "Destructor de Personaje";
+}
+
+
+unsigned short Personaje::getCargaVida() const {return cargaVida;}
 
 void Personaje::movimientoSprite(int direccion, unsigned short cantidadDeSprites)
 {

@@ -9,19 +9,21 @@ class Bonificacion : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 
+public:
+    explicit Bonificacion(const QPixmap &_sprite, QGraphicsItem *parent = nullptr);
+    virtual ~Bonificacion();
+
+    unsigned short getValorCarga() const;
+    void iniciarAnimacionFlotacion();
+    void detenerAnimacion();
+    void actualizarAnimacion();
+
 private:
     QPixmap sprite;
     QTimer *timerAnimacion;
     qreal posicionYInicial;
     qreal direccionAnimacion;
     unsigned short valorCarga;
-
-public:
-    explicit Bonificacion(const QPixmap &_sprite, QGraphicsItem *parent = nullptr);
-    unsigned short getValorCarga() const;
-    void iniciarAnimacionFlotacion();
-    void detenerAnimacion();
-    void actualizarAnimacion();
 };
 
 #endif // BONIFICACION_H

@@ -1,6 +1,7 @@
 #ifndef ENEMIGO_H
 #define ENEMIGO_H
 #include "Personaje.h"
+#include "jugador.h"
 
 class Enemigo : public Personaje
 {
@@ -14,15 +15,35 @@ public:
             unsigned short _anchoSpriteEscalar,
             unsigned short _altoSpriteEscalar);
 
-    void movimientoPredeterminado();
+    virtual ~Enemigo() override;
+    void setJugadorObjetivo(Jugador *jugador);
+
+public slots:
+    void moverEntrePlataformas();
+    void movimientoGolpe();
+    void setPlataformas(const QVector<QRectF> &listaPlataformas);
+    void disparar();
 
 private:
-    QTimer *timerMovimientoPoderRochi;
-    unsigned short contadorspriteMovimientoPoderRochi;
+    QVector<QRectF> plataformas;
+    QTimer *timerMovimiento;
+    QTimer *timerDisparo;
+    QTimer *timerMovimientoGolpe;
+    QTimer* timerSalto;
+    Jugador *jugadorObjetivo;
+    void iniciarMovimientoGolpe();
+    void animarSalto();
+    unsigned short contadorspriteMovimientoGolpe;
+    unsigned short posicionGolpeX;
+    int tiempoSalto;
+    int plataformaActual;
+    bool piedraActiva;
+    bool puedeSaltarEntrePlataformas = true;
+    QPointF origenSalto;
+    QPointF destinoSalto;
 
-    void iniciarMovimientoPoderRochi();
-    void movimientoPoderRochi();
-    void lanzarPoderRochi();
+signals:
+    void golpeRecibido();
 };
 
 #endif // ENEMIGO_H

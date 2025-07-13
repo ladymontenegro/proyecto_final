@@ -7,7 +7,10 @@
 #include <QPixmap>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QVideoWidget>
+#include <QMediaPlayer>
 #include "jugador.h"
+#include "enemigo.h"
 #include "bonificacion.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,27 +33,39 @@ private slots:
     void resetCargaSuperYActualizarBarra();
 
 private:
-    void nivel1();
-    void nivel2();
+    //general
     Ui::MainWindow *ui;
     Jugador *goku;
+    Enemigo *roshi;
+    Personaje *yajirobe;
     QGraphicsView *view;
     QGraphicsScene *scene;
     QWidget *centralWidget;
     QVBoxLayout *mainLayout;
+
+    //cargar nivel uno
+    void nivel1();
+    void crearBloquesCuadrado();
+    void crearMurosLaberinto();
+    void ubicarBonificaciones();
     QTimer *timerReaparicion;
+    QTimer *timerVictoria;
+    QTimer *timerYajirobe;
     QList<Bonificacion*> bonificacionesRecolectadas;
     QList<Bonificacion*> bonificacionesActivas;
     QLabel *superBarLabels[5];
+
+    //cargar nivel dos
+    void nivel2();
+    void crearPlataformas();
     QLabel *lifeBarGokuLabels[5];
     QLabel *lifeBarRoshiLabels[5];
-    int cargaSuper;
+    QVector<QRectF> plataformasDerecha;
 
+    //barras
     void actualizarBarraSuper();
-    void crearBloquesCuadrado();
-    void crearMurosLaberinto();
-    void crearPlataformas();
-    void ubicarBonificaciones();
-    void mostrarBarraSuper(QPixmap &hojaSriteSuper);
+    void actualizarBarraVidaRoshi();
+    void actualizarBarraVidaGoku();
+
 };
 #endif // MAINWINDOW_H
