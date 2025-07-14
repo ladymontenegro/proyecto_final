@@ -42,11 +42,6 @@ Enemigo::Enemigo(QPixmap _hojaSprite,
     // Timer para animar salto
     timerSalto = new QTimer(this);
     connect(timerSalto, &QTimer::timeout, this, &Enemigo::animarSalto);
-
-    // Timer para colisiones
-    timerColisiones = new QTimer(this);
-    connect(timerColisiones, &QTimer::timeout, this, &Enemigo::verificarColisiones);
-    timerColisiones->start(50);
 }
 
 Enemigo::~Enemigo() {
@@ -65,37 +60,9 @@ void Enemigo::perderVida() {
     }
 }
 
-void Enemigo::verificarColisiones() {
-    qDebug() << "[Enemigo] Verificando colisiones";
-    fueAtacado();  // Se delega el trabajo aquí
-}
-
-
-bool Enemigo::fueAtacado() {
-    for (QGraphicsItem* item : collidingItems()) {
-        Ataque* ataque = dynamic_cast<Ataque*>(item);
-
-        if (ataque && ataque->getPropietario() != this) {
-            qDebug() << "[Enemigo] Ataque detectado por:" << static_cast<void*>(ataque->getPropietario());
-
-            perderVida();
-
-            if (scene()) {
-                scene()->removeItem(ataque);
-            }
-            delete ataque;
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
 void Enemigo::setJugadorObjetivo(Jugador *jugador) {
     jugadorObjetivo = jugador;
-    timerDisparo->start(800);
+    timerDisparo->start(1200);
 }
 
 void Enemigo::setPlataformas(const QVector<QRectF> &listaPlataformas) {
@@ -177,9 +144,13 @@ void Enemigo::disparar() {
                                 direccion);
     piedra->usarMovimientoParabolico();
 
-    connect(piedra, &Ataque::destruido, this, [this]() {
-        piedraActiva = false;
-        puedeSaltarEntrePlataformas = true;
+    connect(piedra, &Ataque::destruido, this, [this, piedra]() {
+        // Solo reactivar si esta piedra fue la que se destruyó
+        if (this->piedraActiva) {
+            piedraActiva = false;
+            puedeSaltarEntrePlataformas = true;
+        }
+        piedra->deleteLater();  // Asegurar eliminación
     });
 
     if (scene()) {
@@ -208,4 +179,27 @@ void Enemigo::movimientoGolpe() {
         timerMovimientoGolpe->stop();
     }
 }
+
+void Enemigo::detenerAtaques() {
+    if (timerDisparo && timerDisparo->isActive())
+        timerDisparo->stop();
+
+    if (timerMovimientoGolpe && timerMovimientoGolpe->isActive())
+        timerMovimientoGolpe->stop();
+
+    if (timerSalto && timerSalto->isActive())
+        timerSalto->stop();
+
+    piedraActiva = false;
+
+    qDebug() << "Ataques del enemigo detenidos.";
+}
+
+void Enemigo::detenerMovimiento() {
+    if (timerMovimiento && timerMovimiento->isActive())
+        timerMovimiento->stop();
+
+    qDebug() << "Movimiento del enemigo detenido.";
+}
+
 

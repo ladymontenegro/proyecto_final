@@ -15,6 +15,7 @@ MainWindowDos::MainWindowDos(QWidget *parent)
     : QMainWindow(parent)
     , goku(nullptr)
     , roshi(nullptr)
+    , juegoTerminado(false)
 {
     // Crear el espacio central
     centralWidget = new QWidget(this);
@@ -123,6 +124,7 @@ void MainWindowDos::nivel2()
     goku->setPos(goku->x, goku->y);
 
     connect(goku, &Jugador::vidaCambiada, this, [=](int) { actualizarBarraVidaGoku(); });
+    connect(goku, &Jugador::jugadorMurio, this, &MainWindowDos::removerJugador);
 
     //agregar a Roshi
     QPixmap spriteRoshi(":/multimedia/roshi.png");
@@ -131,6 +133,9 @@ void MainWindowDos::nivel2()
     roshi->setPos(roshi->x, roshi->y);
     roshi->setPlataformas(plataformasDerecha);
     roshi->setJugadorObjetivo(goku);
+
+    connect(roshi, &Enemigo::vidaCambiada, this, [=](int) {actualizarBarraVidaRoshi();});
+    connect(roshi, &Enemigo::enemigoMurio, this, &MainWindowDos::removerEnemigo);
 
     //inicializar barras
     actualizarBarraVidaGoku();
@@ -207,4 +212,47 @@ void MainWindowDos::actualizarBarraVidaRoshi()
 
     //mostrar solo el label correspondiente
     lifeBarRoshiLabels[estado]->setVisible(true);
+}
+
+void MainWindowDos::removerJugador() {
+    if (juegoTerminado) return;
+    juegoTerminado = true;
+
+    if (goku) {
+        scene->removeItem(goku);
+        delete goku;
+        goku = nullptr;
+    }
+
+    detenerJuego();
+
+    QMessageBox::information(this, "¡DERROTA!", "¡Has perdido contra el maestro Roshi!");
+    this->close();
+}
+
+void MainWindowDos::removerEnemigo() {
+    if (juegoTerminado) return;
+    juegoTerminado = true;
+
+    if (roshi) {
+        scene->removeItem(roshi);
+        delete roshi;
+        roshi = nullptr;
+    }
+
+    detenerJuego();
+
+    QMessageBox::information(this, "¡VICTORIA!", "¡Has derrotado al maestro Roshi!");
+    this->close();
+}
+
+void MainWindowDos::detenerJuego() {
+    if (goku) {
+        goku->desactivarControles();
+    }
+
+    if (roshi) {
+        roshi->detenerAtaques();
+        roshi->detenerMovimiento();
+    }
 }

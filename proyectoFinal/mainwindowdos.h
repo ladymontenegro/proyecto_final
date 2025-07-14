@@ -27,12 +27,17 @@ private:
 
     void nivel2();
     void crearPlataformas();
+    void detenerJuego();
+    bool juegoTerminado;
     QLabel *lifeBarGokuLabels[5];
     QLabel *lifeBarRoshiLabels[5];
     QVector<QRectF> plataformasDerecha;
 
+private slots:
     void actualizarBarraVidaRoshi();
     void actualizarBarraVidaGoku();
+    void removerJugador();
+    void removerEnemigo();
 };
 
 #endif // MAINWINDOWDO_H

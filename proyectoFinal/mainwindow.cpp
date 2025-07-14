@@ -260,8 +260,10 @@ void MainWindow::crearBloquesCuadrado(){
 
 void MainWindow::ubicarBonificaciones(){
     QVector<QPoint> posicionesBonificaciones = {
-        {47, 363}, {133, 576}, {522, 576}, {665, 385},
-        {510, 59}, {337, 182}, {67, 150}, {630, 241}
+        //{47, 363}, {133, 576}, {522, 576}, {665, 385},
+        //{510, 59}, {337, 182}, {67, 150}, {630, 241}
+        {250, 310}, {250, 320}, {250, 330}, {250, 340},
+        {450, 310}, {450, 320}, {450, 330}, {450, 340}
     };
 
     //limpiar cualquier bonificación existente
@@ -352,7 +354,7 @@ void MainWindow::resetCargaSuperYActualizarBarra() {
 
 void MainWindow::iniciarTransicionYNivel2()
 {
-    QString rutaVideo = "C:/Users/steve/OneDrive/Escritorio/Videos_protecto/transicion_niveles.mp4";
+    QString rutaVideo = "C:/Users/DELL/Downloads/transicion_niveles.mp4";
     QDesktopServices::openUrl(QUrl::fromLocalFile(rutaVideo));
 
     // Esperamos duracion del video y luego abrir nivel 2

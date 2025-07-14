@@ -26,6 +26,7 @@ Jugador::Jugador(QPixmap _hojaSprite,
     , nivelDosActivo(true)
     , puntoReinicioX(0)
     , puntoReinicioY(0)
+    , porCaida(false)
 {
     //validoCargarSuper = false;
     setFlag(QGraphicsItem::ItemIsFocusable);
@@ -45,11 +46,6 @@ Jugador::Jugador(QPixmap _hojaSprite,
 
     timerGravedad = new QTimer(this);
     connect(timerGravedad, &QTimer::timeout, this, &Jugador::aplicarGravedad);
-
-    timerColisiones = new QTimer(this);
-    connect(timerColisiones, &QTimer::timeout, this, &Jugador::verificarColisiones);
-    timerColisiones->setInterval(50);
-    timerColisiones->start();
 
 }
 
@@ -246,6 +242,33 @@ void Jugador::movimiento(int dx, int dy)
     }
 }
 
+void Jugador::desactivarControles() {
+    // Apagar timers
+    if (timerMovimientoPoderGoku && timerMovimientoPoderGoku->isActive())
+        timerMovimientoPoderGoku->stop();
+
+    if (timerMovimientoSalto && timerMovimientoSalto->isActive())
+        timerMovimientoSalto->stop();
+
+    if (timerMovimientoAgacho && timerMovimientoAgacho->isActive())
+        timerMovimientoAgacho->stop();
+
+    if (timerGravedad && timerGravedad->isActive())
+        timerGravedad->stop();
+
+    // Borrar teclas presionadas
+    teclasPresionadas.clear();
+
+    // Mostrar sprite quieto para no dejar un frame congelado
+    mostrarSpriteQuieto();
+
+    // Desactivar respuesta a teclas
+    setFlag(QGraphicsItem::ItemIsFocusable, false);
+    clearFocus();
+
+    qDebug() << "Controles de jugador desactivados.";
+}
+
 //----------------- ANIMACIONES DE MOVIMIENTO -----------------
 
 void Jugador::iniciarMovimientoPoderGoku()
@@ -419,6 +442,7 @@ void Jugador::movimientoNivelDos(int dx, int dy) {
         newY = limiteSuperior - bordeJugador.top();
     }
     else if (jugadorRect.bottom() > limiteInferior) {
+        porCaida = true;
         perderVida();
         return;
     }
@@ -462,12 +486,6 @@ void Jugador::actualizarEnPlataforma() {
                     break;
                 }
             }
-        } else if (item->type() == QGraphicsPixmapItem::Type) {
-            Ataque *ataque = dynamic_cast<Ataque *>(item);
-            if (ataque) {
-                cargaVida --;
-                emit vidaCambiada(cargaVida);
-            }
         }
     }
 
@@ -497,35 +515,14 @@ void Jugador::perderVida() {
     emit vidaCambiada(cargaVida);
 
     if(cargaVida > 0) {
-        setPos(puntoReinicioX, puntoReinicioY);
-        x = pos().x();
-        y = pos().y();
-        velocidadVertical = 0;
-        enPlataforma = true;
-
+        if(porCaida) {
+            setPos(puntoReinicioX, puntoReinicioY);
+            x = pos().x();
+            y = pos().y();
+            velocidadVertical = 0;
+            enPlataforma = true;
+        } else {porCaida = false;}
     } else {
         emit jugadorMurio();
     }
-}
-
-void Jugador::verificarColisiones() {
-    qDebug() << "[Jugador] Verificando colisiones";
-    for (QGraphicsItem* item : collidingItems()) {
-        qDebug() << "Colisionando con:" << item;
-        Ataque* ataque = dynamic_cast<Ataque*>(item);
-        qDebug() << "Tipo real:" << typeid(*item).name();
-        if (ataque) {
-            qDebug() << "Propietario del ataque:" << static_cast<void*>(ataque->getPropietario());
-            qDebug() << "Jugador actual:" << static_cast<void*>(this);
-            qDebug() << "Es un ataque";
-            if (ataque->getPropietario() != this) {
-                qDebug() << "Ataque enemigo detectado";
-                perderVida();
-                scene()->removeItem(ataque);
-                delete ataque;
-                break;
-            }
-        }
-    }
-
 }

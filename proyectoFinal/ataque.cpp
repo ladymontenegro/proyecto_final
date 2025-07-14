@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include "obstaculo.h"
 #include "jugador.h"
+#include "enemigo.h"
 
 Ataque::Ataque(Personaje* propietario,
                QPixmap _spriteAtaque,
@@ -13,7 +14,7 @@ Ataque::Ataque(Personaje* propietario,
     : propietario(propietario),
     spriteAtaque(_spriteAtaque),
     timerMovimiento(nullptr),
-    velocidad(15),
+    velocidad(20),
     velocidadX(0),
     velocidadYInicial(0),
     gravedad(0),
@@ -116,6 +117,30 @@ void Ataque::mover()
             this->deleteLater();
             return;
         }
+
+        // Detectar Jugador
+        Jugador* jugador = dynamic_cast<Jugador*>(item);
+        if (jugador && propietario != jugador) {
+            jugador->perderVida();
+            if (timerMovimiento) {
+                timerMovimiento->stop();
+                delete timerMovimiento;
+                timerMovimiento = nullptr;
+            }
+            emit destruido();
+            scene()->removeItem(this);
+            deleteLater();
+            return;
+        }
+
+        // Detectar Enemigo
+        Enemigo* enemigo = dynamic_cast<Enemigo*>(item);
+        if (enemigo && propietario != enemigo) {
+            enemigo->perderVida();
+            scene()->removeItem(this);
+            deleteLater();
+            return;
+        }
     }
 }
 
@@ -200,8 +225,25 @@ void Ataque::moverParabolico() {
             }
         }
 
-        if (dynamic_cast<Jugador *>(item)) {
+        // Detectar Jugador
+        Jugador* jugador = dynamic_cast<Jugador*>(item);
+        if (jugador && propietario != jugador) {
+            jugador->perderVida();
+            if (timerMovimiento) {
+                timerMovimiento->stop();
+                delete timerMovimiento;
+                timerMovimiento = nullptr;
+            }
             emit destruido();
+            scene()->removeItem(this);
+            deleteLater();
+            return;
+        }
+
+        // Detectar Enemigo
+        Enemigo* enemigo = dynamic_cast<Enemigo*>(item);
+        if (enemigo && propietario != enemigo) {
+            enemigo->perderVida();
             scene()->removeItem(this);
             deleteLater();
             return;

@@ -55,17 +55,8 @@ private:
     QList<Bonificacion*> bonificacionesActivas;
     QLabel *superBarLabels[5];
 
-    //cargar nivel dos
-    void nivel2();
-    void crearPlataformas();
-    QLabel *lifeBarGokuLabels[5];
-    QLabel *lifeBarRoshiLabels[5];
-    QVector<QRectF> plataformasDerecha;
-
     //barras
     void actualizarBarraSuper();
-    void actualizarBarraVidaRoshi();
-    void actualizarBarraVidaGoku();
     void iniciarTransicionYNivel2();
 };
 #endif // MAINWINDOW_H

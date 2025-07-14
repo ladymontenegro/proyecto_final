@@ -25,6 +25,7 @@ public:
     void setCargaSuper(unsigned short nuevaCarga);
     unsigned short getCargaSuper();
     void perderVida();
+    void desactivarControles();
 
 private:
     //general
@@ -57,10 +58,10 @@ private:
     unsigned short ultimaDireccion;  // 0: derecha, 1: izquierda, 2: arriba, 3: abajo
     QList<unsigned short> teclasPresionadas;
     QTimer* timerGravedad;
-    QTimer* timerColisiones;
 
     //poicion - nivel 2
     bool enPlataforma;
+    bool porCaida;
     qreal velocidadVertical;
 
 private slots:
@@ -87,13 +88,11 @@ protected:
     //verificaciones - actualizaciones
     bool verificarSuperCargado();
     void actualizarEnPlataforma();
-    void verificarColisiones();
 
 signals:
     void bonificacionRecolectada(Bonificacion* bonificacion);
     void poderLanzado();
     void golpeRecibido();
-    void vidaCambiada(int nuevaCargaVida);
     void jugadorMurio();
 };
 

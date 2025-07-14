@@ -26,8 +26,9 @@ public:
     // Métodos públicos
     void setJugadorObjetivo(Jugador *jugador);
     void setPlataformas(const QVector<QRectF> &listaPlataformas);
-    void verificarColisiones();
     void perderVida();
+    void detenerAtaques();
+    void detenerMovimiento();
 
 public slots:
     void moverEntrePlataformas();
@@ -41,14 +42,12 @@ private:
     // Referencias
     Jugador *jugadorObjetivo = nullptr;
     QVector<QRectF> plataformas;
-    bool fueAtacado();
 
     // Timers
     QTimer *timerMovimiento = nullptr;
     QTimer *timerDisparo = nullptr;
     QTimer *timerMovimientoGolpe = nullptr;
     QTimer *timerSalto = nullptr;
-    QTimer *timerColisiones = nullptr;
 
     // Estado de animaciones y control
     bool piedraActiva = false;
