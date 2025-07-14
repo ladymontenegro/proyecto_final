@@ -4,6 +4,7 @@
 #include "ataque.h"
 #include "bonificacion.h"
 #include "qgraphicsscene.h"
+#include <typeinfo>
 
 Jugador::Jugador(QPixmap _hojaSprite,
                  unsigned short _x,
@@ -44,6 +45,12 @@ Jugador::Jugador(QPixmap _hojaSprite,
 
     timerGravedad = new QTimer(this);
     connect(timerGravedad, &QTimer::timeout, this, &Jugador::aplicarGravedad);
+
+    timerColisiones = new QTimer(this);
+    connect(timerColisiones, &QTimer::timeout, this, &Jugador::verificarColisiones);
+    timerColisiones->setInterval(50);
+    timerColisiones->start();
+
 }
 
 Jugador::~Jugador()
@@ -291,7 +298,7 @@ void Jugador::lanzarPoderGoku()
         spriteEscalado = sprite.scaled(30, 20);
     }
 
-    Ataque *ataqueGoku = new Ataque(spriteEscalado, inicio, ultimaDireccion);
+    Ataque *ataqueGoku = new Ataque(this, spriteEscalado, inicio, ultimaDireccion);
     scene()->addItem(ataqueGoku);
 }
 
@@ -499,4 +506,26 @@ void Jugador::perderVida() {
     } else {
         emit jugadorMurio();
     }
+}
+
+void Jugador::verificarColisiones() {
+    qDebug() << "[Jugador] Verificando colisiones";
+    for (QGraphicsItem* item : collidingItems()) {
+        qDebug() << "Colisionando con:" << item;
+        Ataque* ataque = dynamic_cast<Ataque*>(item);
+        qDebug() << "Tipo real:" << typeid(*item).name();
+        if (ataque) {
+            qDebug() << "Propietario del ataque:" << static_cast<void*>(ataque->getPropietario());
+            qDebug() << "Jugador actual:" << static_cast<void*>(this);
+            qDebug() << "Es un ataque";
+            if (ataque->getPropietario() != this) {
+                qDebug() << "Ataque enemigo detectado";
+                perderVida();
+                scene()->removeItem(ataque);
+                delete ataque;
+                break;
+            }
+        }
+    }
+
 }

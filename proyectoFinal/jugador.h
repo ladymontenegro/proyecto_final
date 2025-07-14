@@ -57,6 +57,7 @@ private:
     unsigned short ultimaDireccion;  // 0: derecha, 1: izquierda, 2: arriba, 3: abajo
     QList<unsigned short> teclasPresionadas;
     QTimer* timerGravedad;
+    QTimer* timerColisiones;
 
     //poicion - nivel 2
     bool enPlataforma;
@@ -86,6 +87,7 @@ protected:
     //verificaciones - actualizaciones
     bool verificarSuperCargado();
     void actualizarEnPlataforma();
+    void verificarColisiones();
 
 signals:
     void bonificacionRecolectada(Bonificacion* bonificacion);

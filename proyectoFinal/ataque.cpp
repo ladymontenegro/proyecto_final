@@ -6,37 +6,23 @@
 #include "obstaculo.h"
 #include "jugador.h"
 
-Ataque::Ataque(QPixmap _spriteAtaque, QPointF inicioPosicion, unsigned short _direccion)
-    : QGraphicsPixmapItem()
-    , velocidad(15)
-    , direccion(_direccion)
-    , spriteAtaque(_spriteAtaque)
-    , velocidadX(0)
-    , velocidadYInicial(0)
-    , gravedad(0)
-    , tiempo(0)
-    , posicionInicial(inicioPosicion)
-{
-    // Reflejar sprite si va a la izquierda
-    if (direccion == 1) {
-        spriteAtaque = spriteAtaque.transformed(QTransform().scale(-1, 1));
-    }
-
-    setPixmap(spriteAtaque);
-    setPos(inicioPosicion);
-
-    // Crear e iniciar el temporizador de movimiento
-    timerMovimiento = new QTimer(this);
-    connect(timerMovimiento, &QTimer::timeout, this, &Ataque::mover);
-    timerMovimiento->start(40);
-}
-
-Ataque::Ataque(QPixmap _spriteAtaque, QPointF inicioPosicion, QPointF _destino, unsigned short _direccion)
-    : QGraphicsPixmapItem(),
+Ataque::Ataque(Personaje* propietario,
+               QPixmap _spriteAtaque,
+               QPointF inicioPosicion,
+               unsigned short _direccion)
+    : propietario(propietario),
+    spriteAtaque(_spriteAtaque),
+    timerMovimiento(nullptr),
+    velocidad(15),
+    velocidadX(0),
+    velocidadYInicial(0),
+    gravedad(0),
+    tiempo(0),
     direccion(_direccion),
-    destinoFinal(_destino),
-    spriteAtaque(_spriteAtaque)
+    posicionInicial(inicioPosicion),
+    destinoFinal(QPointF()) // no se usa en rectilíneo, lo dejamos como (0,0)
 {
+    // Reflejar sprite si va hacia la izquierda
     if (direccion == 1) {
         spriteAtaque = spriteAtaque.transformed(QTransform().scale(-1, 1));
     }
@@ -44,10 +30,44 @@ Ataque::Ataque(QPixmap _spriteAtaque, QPointF inicioPosicion, QPointF _destino, 
     setPixmap(spriteAtaque);
     setPos(inicioPosicion);
 
+    // Crear y conectar el timer para movimiento rectilíneo
     timerMovimiento = new QTimer(this);
     connect(timerMovimiento, &QTimer::timeout, this, &Ataque::mover);
     timerMovimiento->start(40);
 }
+
+
+Ataque::Ataque(Personaje* propietario,
+               QPixmap _spriteAtaque,
+               QPointF inicioPosicion,
+               QPointF _destino,
+               unsigned short _direccion)
+    : propietario(propietario),
+    spriteAtaque(_spriteAtaque),
+    timerMovimiento(nullptr),
+    velocidad(15),
+    velocidadX(0),
+    velocidadYInicial(0),
+    gravedad(0),
+    tiempo(0),
+    direccion(_direccion),
+    posicionInicial(inicioPosicion),
+    destinoFinal(_destino)
+{
+    // Reflejar sprite si va hacia la izquierda
+    if (direccion == 1) {
+        spriteAtaque = spriteAtaque.transformed(QTransform().scale(-1, 1));
+    }
+
+    setPixmap(spriteAtaque);
+    setPos(inicioPosicion);
+
+    // Crear y conectar el timer para movimiento parabólico
+    timerMovimiento = new QTimer(this);
+    connect(timerMovimiento, &QTimer::timeout, this, &Ataque::mover);
+    timerMovimiento->start(40);
+}
+
 
 Ataque::~Ataque()
 {
@@ -58,6 +78,10 @@ Ataque::~Ataque()
     }
 
     qDebug() << "Destructor de Ataque";
+}
+
+Personaje* Ataque::getPropietario() const{
+    return propietario;
 }
 
 void Ataque::mover()
@@ -128,9 +152,6 @@ void Ataque::usarMovimientoParabolico() {
     disconnect(timerMovimiento, &QTimer::timeout, this, &Ataque::mover);
     connect(timerMovimiento, &QTimer::timeout, this, &Ataque::moverParabolico);
 }
-
-
-
 
 void Ataque::moverParabolico() {
     if (!scene() || !scene()->views().first()->rect().contains(pos().toPoint())) {
