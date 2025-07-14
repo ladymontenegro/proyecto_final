@@ -1,15 +1,16 @@
 #include "mainwindow.h"
+#include <QDesktopServices>
 #include <QGraphicsItem>
+#include <QGraphicsProxyWidget>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QVector>
-#include <QGraphicsProxyWidget>
 #include "QGraphicsPixmapItem"
 #include "bonificacion.h"
 #include "jugador.h"
-#include "enemigo.h"
+#include "mainwindowdos.h"
 #include "obstaculo.h"
 #include "ui_mainwindow.h"
 
@@ -42,8 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    //nivel1();
-    nivel2();
+    nivel1();
 }
 
 MainWindow::~MainWindow()
@@ -166,7 +166,8 @@ void MainWindow::nivel1()
         if (yajirobe->verificarVictoriaNivel1()) {
             timerVictoria->stop(); // Detiene el timer al ganar
             timerYajirobe->stop();
-            QMessageBox::information(this, "¡¡VICTORIA!!", "¡Has rescatado a Yajirobe!");
+            //QMessageBox::information(this,, "¡¡VICTORIA!!", "¡Has rescatado a Yajirobe!");
+            iniciarTransicionYNivel2();
         }
     });
     timerVictoria->start(100); // chequear cada 100 ms
@@ -349,153 +350,15 @@ void MainWindow::resetCargaSuperYActualizarBarra() {
     actualizarBarraSuper();
 }
 
-//----------------- METODOS PARA LA CARGA DEL NIVEL DOS -----------------
-void MainWindow::nivel2(){
-    //CONFIGURAR LA VISTA
-    resize(1000, 600);
+void MainWindow::iniciarTransicionYNivel2()
+{
+    QString rutaVideo = "C:/Users/steve/OneDrive/Escritorio/Videos_protecto/transicion_niveles.mp4";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(rutaVideo));
 
-    QWidget *lifeBarContainer = new QWidget();
-    lifeBarContainer->setFixedHeight(50); //le damos altura
-    lifeBarContainer->setStyleSheet("background-color: transparent;");
-
-    QHBoxLayout *lifeBarLayout = new QHBoxLayout(lifeBarContainer);
-    lifeBarLayout->setSpacing(450);
-    lifeBarLayout->setContentsMargins(10, 5, 40, 5);
-
-    QHBoxLayout *barraGokuLayout = new QHBoxLayout();
-    barraGokuLayout->setSpacing(0);
-    barraGokuLayout->setContentsMargins(0, 0, 0, 0);
-
-    QHBoxLayout *barraRoshiLayout = new QHBoxLayout();
-    barraRoshiLayout->setSpacing(0);
-    barraRoshiLayout->setContentsMargins(0, 0, 0, 0);
-
-
-    QPixmap imagenRoshi(":/multimedia/barraRoshi.png");
-    for(int i = 0; i < 5; i++) {
-        lifeBarRoshiLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarRoshiLabels[i]->setFixedSize(250, 50);
-
-        // Obtener el sprite correspondiente
-        int y = i * 100;
-        QPixmap sprite = imagenRoshi.copy(0, y, 500, 100);
-        QPixmap scaled = sprite.scaled(250, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-        lifeBarRoshiLabels[i]->setPixmap(scaled);
-        lifeBarRoshiLabels[i]->setVisible(false); //inicialmente ocultos
-        barraRoshiLayout->addWidget(lifeBarRoshiLabels[i]);
-    }
-
-    QPixmap imagenGoku(":/multimedia/barraGoku.png");
-    for(int i = 0; i < 5; i++) {
-        lifeBarGokuLabels[i] = new QLabel(lifeBarContainer);
-        lifeBarGokuLabels[i]->setFixedSize(250, 50);
-
-        // Obtener el sprite correspondiente
-        int y = i * 100;
-        QPixmap sprite = imagenGoku.copy(0, y, 500, 100);
-        QPixmap scaled = sprite.scaled(250, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-        lifeBarGokuLabels[i]->setPixmap(scaled);
-        lifeBarGokuLabels[i]->setVisible(false); //inicialmente ocultos
-        barraGokuLayout->addWidget(lifeBarGokuLabels[i]);
-    }
-
-    lifeBarLayout->addStretch();
-    lifeBarLayout->addLayout(barraGokuLayout);
-    lifeBarLayout->addLayout(barraRoshiLayout);
-    lifeBarLayout->addStretch();
-
-    QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
-    proxyWidget->setWidget(lifeBarContainer);
-    scene->addItem(proxyWidget);
-    proxyWidget->setPos(0, 10);
-
-    QPixmap imagenCueva(":/multimedia/cueva.png");
-    QGraphicsPixmapItem *cueva = new QGraphicsPixmapItem(imagenCueva);
-    cueva->setZValue(-100);
-    scene->addItem(cueva);
-    scene->setSceneRect(cueva->boundingRect());
-    mainLayout->addWidget(view);
-    crearPlataformas();
-
-    //AGREGAR PERSONAJES
-    //agregar a Goku
-    QPixmap spriteGoku(":/multimedia/goku.png");
-    goku = new Jugador(spriteGoku, 36, 248, 64, 64, 50, 50);
-    scene->addItem(goku);
-    goku->setFocus();
-    goku->setPuntoReinicio(36, 336);
-    goku->setPos(goku->x, goku->y);
-
-    connect(goku, &Jugador::vidaCambiada, this, &MainWindow::actualizarBarraVidaGoku);
-
-    //agregar a Roshi
-    QPixmap spriteRoshi(":/multimedia/roshi.png");
-    roshi = new Enemigo(spriteRoshi, 848, 248, 64, 64, 50, 50);
-    scene->addItem(roshi);
-    roshi->setPos(roshi->x, roshi->y);
-    roshi->setPlataformas(plataformasDerecha);
-    roshi->setJugadorObjetivo(goku);
-
-    //inicializar barras
-    actualizarBarraVidaGoku();
-    actualizarBarraVidaRoshi();
-}
-
-void MainWindow::crearPlataformas(){
-    QVector<QRectF> posicionesPlataformas = {
-        {0, 296, 312, 32}, {0, 384, 236, 32}, {0, 468, 400, 32},
-        {768, 296, 228, 32}, {608, 388, 388, 32}, {500, 468, 496, 32}
-    };
-
-    for(auto &datosPlataforma : posicionesPlataformas){
-        QGraphicsRectItem *plataforma = new QGraphicsRectItem(datosPlataforma);
-        plataforma->setBrush(Qt::NoBrush);
-        plataforma->setPen(Qt::NoPen);
-        //plataforma->setBrush(QColor("#6d2045"));
-        //plataforma->setPen(QColor("#FFFFFF"));
-        //plataforma->setFlag(QGraphicsItem::ItemIsMovable);
-        //plataforma->setOpacity(0.5);
-        scene->addItem(plataforma);
-        if (plataforma && plataforma->rect().x() > 495) {
-            plataformasDerecha.append(plataforma->rect());
-        }
-    }
-}
-
-void MainWindow::actualizarBarraVidaGoku() {
-    //ocultar todos los labels primero
-    for(int i = 0; i < 5; i++) {
-        lifeBarGokuLabels[i]->setVisible(false);
-    }
-
-    int estado = 0;
-
-    if(goku->getCargaVida() >= 4) estado = 4;
-    else if(goku->getCargaVida() >= 3) estado = 3;
-    else if(goku->getCargaVida() >= 2) estado = 2;
-    else if(goku->getCargaVida() >= 1) estado = 1;
-    else estado = 0;
-
-    //mostrar solo el label correspondiente
-    lifeBarGokuLabels[estado]->setVisible(true);
-}
-
-void MainWindow::actualizarBarraVidaRoshi() {
-    //ocultar todos los labels primero
-    for(int i = 0; i < 5; i++) {
-        lifeBarRoshiLabels[i]->setVisible(false);
-    }
-
-    int estado = 0;
-
-    if(roshi->getCargaVida() >= 4) estado = 4;
-    else if(roshi->getCargaVida() >= 3) estado = 3;
-    else if(roshi->getCargaVida() >= 2) estado = 2;
-    else if(roshi->getCargaVida() >= 1) estado = 1;
-    else estado = 0;
-
-    //mostrar solo el label correspondiente
-    lifeBarRoshiLabels[estado]->setVisible(true);
+    // Esperamos duracion del video y luego abrir nivel 2
+    QTimer::singleShot(60000, this, [=]() {
+        MainWindowDos *ventanaNivel2 = new MainWindowDos();
+        ventanaNivel2->show();
+        this->close(); // Cierramos la otra ventana
+    });
 }

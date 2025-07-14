@@ -15,6 +15,7 @@ SOURCES += \
     jugador.cpp \
     main.cpp \
     mainwindow.cpp \
+    mainwindowdos.cpp \
     obstaculo.cpp \
     personaje.cpp
 
@@ -24,6 +25,7 @@ HEADERS += \
     enemigo.h \
     jugador.h \
     mainwindow.h \
+    mainwindowdos.h \
     obstaculo.h \
     personaje.h
 

@@ -66,6 +66,6 @@ private:
     void actualizarBarraSuper();
     void actualizarBarraVidaRoshi();
     void actualizarBarraVidaGoku();
-
+    void iniciarTransicionYNivel2();
 };
 #endif // MAINWINDOW_H
