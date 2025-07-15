@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,6 +15,7 @@ SOURCES += \
     jugador.cpp \
     main.cpp \
     mainwindow.cpp \
+    mainwindowdos.cpp \
     obstaculo.cpp \
     personaje.cpp
 
@@ -24,6 +25,7 @@ HEADERS += \
     enemigo.h \
     jugador.h \
     mainwindow.h \
+    mainwindowdos.h \
     obstaculo.h \
     personaje.h
 

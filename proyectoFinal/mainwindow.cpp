@@ -1,5 +1,7 @@
 #include "mainwindow.h"
+#include <QDesktopServices>
 #include <QGraphicsItem>
+#include <QGraphicsProxyWidget>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
@@ -8,13 +10,15 @@
 #include "QGraphicsPixmapItem"
 #include "bonificacion.h"
 #include "jugador.h"
+#include "mainwindowdos.h"
 #include "obstaculo.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , cargaSuper(0)
+    , goku(nullptr)
+    , roshi(nullptr)
 {
     ui->setupUi(this);
 
@@ -40,10 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     nivel1();
-    QMessageBox::information(nullptr,
-                             "NIVEL 1",
-                             "!!Yajirobe esta atrapado!!\nAumenta tu super con comida y utiliza tu "
-                             "poder para rescatar a Yajirobe");
 }
 
 MainWindow::~MainWindow()
@@ -62,12 +62,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//METODOS PARA LA CARGA DEL NIVEL UNO
+//----------------- METODOS PARA LA CARGA DEL NIVEL UNO -----------------
 void MainWindow::nivel1()
 {
     //CONFIGURAR LA VENTANA
 
-    resize(650, 710);
+    resize(700, 700);
 
     //este sera el contenedor donde ira lo de la barra
     QWidget *superBarContainer = new QWidget(this);
@@ -117,10 +117,6 @@ void MainWindow::nivel1()
     superBarLayout->addWidget(titleLabel);
     superBarLayout->addStretch();
 
-
-    //inicializar barra
-    actualizarBarraSuper();
-
     //ELEMENTOS DE LA ESCENA
     //crear el laberinto
     QPixmap imagenLaberinto(":/multimedia/laberinto.png");
@@ -135,17 +131,21 @@ void MainWindow::nivel1()
     //AGREGAR PERSONAJES
     //agregar a Goku
     QPixmap spriteGoku(":/multimedia/goku.png");
-    goku = new Jugador(spriteGoku);
-    scene->addItem(goku);
+    goku = new Jugador(spriteGoku, 267, 271, 64, 64, 22, 22);
+    goku->nivelDosActivo = false;
     goku->setFocus();
-    goku->setPos(267, 271);
+    goku->setPos(goku->x, goku->y);
+    scene->addItem(goku);
+
+    //inicializar barra
+    actualizarBarraSuper();
 
     //agregar a Yajirobe
     QPixmap spriteYajirobe(":/multimedia/yajirobe.png");
-    Personaje *yajirobe = new Personaje(spriteYajirobe);
+    Personaje *yajirobe = new Personaje(spriteYajirobe, 350, 330, 63, 48, 25, 25);
     yajirobe->direccionXYajirobe = -3;
     scene->addItem(yajirobe);
-    yajirobe->setPos(350, 330);
+    yajirobe->setPos(yajirobe->x, yajirobe->y);
 
     //Timer para que se mueva solo
     QTimer *timerYajirobe = new QTimer(yajirobe);
@@ -166,10 +166,14 @@ void MainWindow::nivel1()
         if (yajirobe->verificarVictoriaNivel1()) {
             timerVictoria->stop(); // Detiene el timer al ganar
             timerYajirobe->stop();
-            QMessageBox::information(this, "¡¡VICTORIA!!", "¡Has rescatado a Yajirobe!");
+            //QMessageBox::information(this,, "¡¡VICTORIA!!", "¡Has rescatado a Yajirobe!");
+            iniciarTransicionYNivel2();
         }
     });
     timerVictoria->start(100); // chequear cada 100 ms
+
+    QMessageBox::information(nullptr, "NIVEL 1", "!!Yajirobe esta atrapado!!\nAumenta tu super con comida y utiliza tu "
+                                                 "poder para rescatar a Yajirobe");
 }
 
 void MainWindow::crearMurosLaberinto()
@@ -256,8 +260,10 @@ void MainWindow::crearBloquesCuadrado(){
 
 void MainWindow::ubicarBonificaciones(){
     QVector<QPoint> posicionesBonificaciones = {
-        {47, 363}, {133, 576}, {522, 576}, {665, 385},
-        {510, 59}, {337, 182}, {67, 150}, {630, 241}
+        //{47, 363}, {133, 576}, {522, 576}, {665, 385},
+        //{510, 59}, {337, 182}, {67, 150}, {630, 241}
+        {250, 310}, {250, 320}, {250, 330}, {250, 340},
+        {450, 310}, {450, 320}, {450, 330}, {450, 340}
     };
 
     //limpiar cualquier bonificación existente
@@ -304,9 +310,7 @@ void MainWindow::manejarBonificacionRecolectada(Bonificacion* bonificacion) {
 
     scene->removeItem(bonificacion);
 
-    cargaSuper += 25;
-
-    if(cargaSuper >= 100) {
+    if(goku->getCargaSuper() >= 100) {
         goku->setValidoCargarSuper(true);
     }
 
@@ -333,10 +337,10 @@ void MainWindow::actualizarBarraSuper() {
     }
 
     int estado = 0;
-    if(cargaSuper >= 100) estado = 4;
-    else if(cargaSuper >= 75) estado = 3;
-    else if(cargaSuper >= 50) estado = 2;
-    else if(cargaSuper >= 25) estado = 1;
+    if(goku->getCargaSuper() >= 100) estado = 4;
+    else if(goku->getCargaSuper() >= 75) estado = 3;
+    else if(goku->getCargaSuper() >= 50) estado = 2;
+    else if(goku->getCargaSuper() >= 25) estado = 1;
     else estado = 0;
 
     //mostrar solo el label correspondiente
@@ -344,25 +348,19 @@ void MainWindow::actualizarBarraSuper() {
 }
 
 void MainWindow::resetCargaSuperYActualizarBarra() {
-    cargaSuper = 0;
+    goku->setCargaSuper(0);
     actualizarBarraSuper();
 }
 
+void MainWindow::iniciarTransicionYNivel2()
+{
+    QString rutaVideo = "C:/Users/DELL/Downloads/transicion_niveles.mp4";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(rutaVideo));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // Esperamos duracion del video y luego abrir nivel 2
+    QTimer::singleShot(60000, this, [=]() {
+        MainWindowDos *ventanaNivel2 = new MainWindowDos();
+        ventanaNivel2->show();
+        this->close(); // Cierramos la otra ventana
+    });
+}

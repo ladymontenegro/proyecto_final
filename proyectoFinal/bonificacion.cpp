@@ -10,6 +10,17 @@ Bonificacion::Bonificacion(const QPixmap &sprite, QGraphicsItem *parent)
     direccionAnimacion = 0.7; // 1 = abajo, -1 = arriba
 }
 
+Bonificacion::~Bonificacion()
+{
+    if (timerAnimacion) {
+        timerAnimacion->stop();
+        delete timerAnimacion;
+        timerAnimacion = nullptr;
+    }
+
+    qDebug() << "Destructor de Bonificacion";
+}
+
 void Bonificacion::iniciarAnimacionFlotacion() {
     posicionYInicial = y();
     timerAnimacion->start(30); // Actualizar cada 50ms

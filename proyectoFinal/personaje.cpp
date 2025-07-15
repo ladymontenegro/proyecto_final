@@ -5,29 +5,48 @@
 #include "jugador.h"
 #include "obstaculo.h"
 
-Personaje::Personaje(QPixmap _hojaSprite)
-    : hojaSprite(_hojaSprite)
+Personaje::Personaje(QPixmap _hojaSprite,
+                     unsigned short _x,
+                     unsigned short _y,
+                     unsigned short _anchoSprite,
+                     unsigned short _altoSprite,
+                     unsigned short _anchoSpriteEscalar,
+                     unsigned short _altoSpriteEscalar)
+    : x(_x)
+    , y(_y)
+    , hojaSprite(_hojaSprite)
     , posicionX(0)
     , posicionY(0)
-    , anchoSprite(64)
-    , altoSprite(64)
+    , anchoSprite(_anchoSprite)
+    , altoSprite(_altoSprite)
+    , anchoSpriteEscalar(_anchoSpriteEscalar)
+    , altoSpriteEscalar(_altoSpriteEscalar)
     , conteoSprite(0)
+    , cargaVida(4)
 {
     sprite = hojaSprite.copy(posicionX, posicionY, anchoSprite, altoSprite);
-    QPixmap spriteEscalado = sprite.scaled(22, 22);
+    QPixmap spriteEscalado = sprite.scaled(anchoSpriteEscalar, altoSpriteEscalar);
     setPixmap(spriteEscalado);
 }
 
-void Personaje::movimientoSprite(int direccion)
+Personaje::~Personaje()
+{
+    qDebug() << "Destructor de Personaje";
+}
+
+
+unsigned short Personaje::getCargaVida() const {return cargaVida;}
+
+void Personaje::movimientoSprite(int direccion, unsigned short cantidadDeSprites)
 {
     posicionY = direccion;
     posicionX = anchoSprite * conteoSprite;
     sprite = hojaSprite.copy(posicionX, posicionY, anchoSprite, altoSprite);
-    QPixmap spriteEscalado = sprite.scaled(22, 22);
+    QPixmap spriteEscalado = sprite.scaled(anchoSpriteEscalar, altoSpriteEscalar);
     setPixmap(spriteEscalado);
     conteoSprite++;
 
-    if (conteoSprite == 8) {
+    if (conteoSprite == cantidadDeSprites) {
         conteoSprite = 0;
     }
 }
@@ -35,7 +54,7 @@ void Personaje::movimientoSprite(int direccion)
 void Personaje::movimientoSpriteYajirobe()
 {
     posicionY = 0;
-    posicionX = 63 * conteoSprite;
+    posicionX = anchoSprite * conteoSprite;
 
     conteoSprite++;
 
@@ -51,7 +70,7 @@ void Personaje::movimientoSpriteYajirobe()
             // Invertir direccion
             direccionXYajirobe *= -1;
             sprite = sprite.transformed(QTransform().scale(-1, 1));
-            QPixmap spriteEscalado = sprite.scaled(22, 22);
+            QPixmap spriteEscalado = sprite.scaled(anchoSpriteEscalar, altoSpriteEscalar);
             setPixmap(spriteEscalado);
             break;
         }
